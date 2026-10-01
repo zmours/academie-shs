@@ -1,0 +1,6 @@
+# Configuration Cloudflare Pages (utilisée par `wrangler pages dev` en local).
+# Les secrets ne vont JAMAIS ici : en local dans `.dev.vars`, en production dans
+# Cloudflare → Pages → academie-shs → Settings → Variables and Secrets.
+name = "academie-shs"
+pages_build_output_dir = "dist"
+compatibility_date = "2026-10-01"

@@ -1,0 +1,16 @@
+---
+// Le signe de l'Académie : l'étoile à huit branches du zellige (deux carrés croisés), le point d'or
+// au centre. `trait` permet de l'épaissir quand il est affiché petit.
+interface Props {
+  taille?: number;
+  couleur?: string;
+  trait?: number;
+}
+const { taille = 34, couleur = '#FFFFFF', trait = 6 } = Astro.props;
+---
+
+<svg width={taille} height={taille} viewBox="0 0 100 100" fill="none" aria-hidden="true">
+  <rect x="23" y="23" width="54" height="54" rx="3" stroke={couleur} stroke-width={trait}></rect>
+  <rect x="23" y="23" width="54" height="54" rx="3" stroke={couleur} stroke-width={trait} transform="rotate(45 50 50)"></rect>
+  <circle cx="50" cy="50" r="11" fill="#F5B42A"></circle>
+</svg>

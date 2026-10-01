@@ -1,0 +1,134 @@
+---
+import '@fontsource/readex-pro/300.css';
+import '@fontsource/readex-pro/400.css';
+import '@fontsource/readex-pro/500.css';
+import '@fontsource/readex-pro/600.css';
+import '@fontsource/readex-pro/700.css';
+import '@fontsource/amiri/400.css';
+import '@fontsource/amiri/700.css';
+import '../styles/global.css';
+
+import Signe from '../components/Signe.astro';
+import type { Langue } from '../data/cours';
+import { ASSOCIATION, CHEMINS, DIRECTION, LANGUES, TEXTES } from '../i18n/textes';
+
+interface Props {
+  langue: Langue;
+  titre?: string;
+  description?: string;
+  /** Page d'accueil : déclare ses deux autres versions linguistiques aux moteurs de recherche. */
+  accueil?: boolean;
+}
+
+const { langue, accueil = false } = Astro.props;
+const t = TEXTES[langue];
+const titre = Astro.props.titre ?? t.meta.titre;
+const description = Astro.props.description ?? t.meta.description;
+const site = Astro.site ?? new URL('https://academie-shs.fr');
+const canonique = new URL(Astro.url.pathname, site).href;
+const image = new URL('/og-image.jpg', site).href;
+const accueilLangue = CHEMINS[langue];
+const LOCALE_OG: Record<Langue, string> = { fr: 'fr_FR', ar: 'ar_AR', en: 'en_GB' };
+const NOMS_LANGUES: Record<Langue, { court: string; complet: string }> = {
+  fr: { court: 'FR', complet: 'Français' },
+  ar: { court: 'ع', complet: 'العربية' },
+  en: { court: 'EN', complet: 'English' },
+};
+const nomPied = langue === 'en' ? ASSOCIATION.nomAnglais : langue === 'ar' ? ASSOCIATION.nomArabe : ASSOCIATION.nom;
+---
+
+<!doctype html>
+<html lang={langue} dir={DIRECTION[langue]}>
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>{titre}</title>
+    <meta name="description" content={description} />
+    <link rel="canonical" href={canonique} />
+    {
+      accueil &&
+        LANGUES.map((l) => <link rel="alternate" hreflang={l} href={new URL(CHEMINS[l], site).href} />)
+    }
+    {accueil && <link rel="alternate" hreflang="x-default" href={new URL('/', site).href} />}
+    <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+    <link rel="apple-touch-icon" href="/apple-touch-icon.png" />
+    <meta name="theme-color" content="#0B2147" />
+
+    <meta property="og:type" content="website" />
+    <meta property="og:site_name" content="Académie SHS" />
+    <meta property="og:title" content={titre} />
+    <meta property="og:description" content={description} />
+    <meta property="og:url" content={canonique} />
+    <meta property="og:image" content={image} />
+    <meta property="og:image:width" content="1200" />
+    <meta property="og:image:height" content="630" />
+    <meta property="og:locale" content={LOCALE_OG[langue]} />
+    <meta name="twitter:card" content="summary_large_image" />
+  </head>
+  <body>
+    <div class="bandeau">{t.bandeau}</div>
+
+    <header class="entete">
+      <div class="conteneur entete__ligne">
+        <a href={accueilLangue} class="marque">
+          <span class="marque__signe"><Signe /></span>
+          <span class="marque__texte">
+            <span class="marque__nom">{langue === 'ar' ? 'الأكاديمية الفرنسية' : 'Académie SHS'}</span>
+            <span class="marque__sous-titre">{t.marque.sousTitre}</span>
+          </span>
+        </a>
+        <nav class="nav" aria-label={t.nav.principale}>
+          <a href={`${accueilLangue}#cours`}>{t.nav.cours}</a>
+          <a href={`${accueilLangue}#etapes`}>{t.nav.etapes}</a>
+          <a href={`${accueilLangue}#faq`}>{t.nav.faq}</a>
+        </nav>
+        <div class="entete__actions">
+          <nav class="langues" aria-label={t.nav.langue}>
+            {
+              LANGUES.map((l) => (
+                <a
+                  href={CHEMINS[l]}
+                  lang={l}
+                  hreflang={l}
+                  aria-current={l === langue && accueil ? 'page' : undefined}
+                  aria-label={NOMS_LANGUES[l].complet}
+                >
+                  {NOMS_LANGUES[l].court}
+                </a>
+              ))
+            }
+          </nav>
+          <a href={`${accueilLangue}#preinscription`} class="bouton bouton--bleu">{t.nav.cta}</a>
+        </div>
+      </div>
+    </header>
+
+    <main id="contenu">
+      <slot />
+    </main>
+
+    <footer class="pied">
+      <div class="conteneur pied__colonnes">
+        <div class="pied__colonne">
+          <div class="pied__marque">Académie SHS</div>
+          <div>{nomPied}</div>
+          {langue !== 'ar' && <div class="pied__arabe" lang="ar">{ASSOCIATION.nomArabe}</div>}
+        </div>
+        <div class="pied__colonne">
+          <div class="pied__titre">{t.pied.association}</div>
+          <div>{langue === 'ar' ? 'جمعية خاضعة لقانون 1901' : langue === 'en' ? 'Non-profit association (French law of 1901)' : 'Association loi 1901'}</div>
+          <div>SIREN {ASSOCIATION.siren}</div>
+          <div lang="fr">{ASSOCIATION.adresse}</div>
+          <div lang="fr">{ASSOCIATION.ville}</div>
+        </div>
+        <div class="pied__colonne">
+          <div class="pied__titre">{t.pied.contact}</div>
+          <a href={`mailto:${ASSOCIATION.courriel}`}>{ASSOCIATION.courriel}</a>
+          <a href="/mentions-legales/">{t.pied.mentionsLegales}</a>
+          <a href="/confidentialite/">{t.pied.confidentialite}</a>
+        </div>
+      </div>
+      <div class="pied__bas">© {new Date().getFullYear()} {ASSOCIATION.nom}</div>
+    </footer>
+  </body>
+</html>

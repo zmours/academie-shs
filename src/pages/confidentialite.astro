@@ -1,0 +1,80 @@
+---
+// Politique de confidentialité. Elle décrit ce que fait réellement le formulaire
+// (functions/api/preinscription.ts) : si le formulaire change, ce texte change aussi.
+import Base from '../layouts/Base.astro';
+import { ASSOCIATION, VERSION_CONSENTEMENT } from '../i18n/textes';
+---
+
+<Base
+  langue="fr"
+  titre="Politique de confidentialité — Académie SHS"
+  description="Comment l'Académie traite les données de la préinscription."
+>
+  <article class="page-texte">
+    <h1>Politique de confidentialité</h1>
+
+    <h2>Responsable du traitement</h2>
+    <p>
+      L'association <strong>{ASSOCIATION.nom}</strong>, {ASSOCIATION.adresse}, {ASSOCIATION.ville}
+      (SIREN {ASSOCIATION.siren}). Pour toute question :
+      <a href={`mailto:${ASSOCIATION.courriel}`}>{ASSOCIATION.courriel}</a>.
+    </p>
+
+    <h2>Données recueillies</h2>
+    <p>
+      Par le formulaire de préinscription : prénom, nom, adresse électronique, numéro WhatsApp, pays de
+      résidence, niveau, cours choisis, langue(s) et créneaux souhaités, la façon dont vous avez connu
+      l'Académie, ainsi que vos choix de consentement et leur date.
+    </p>
+    <p>
+      Le choix de cours de sciences islamiques ou de théologie peut révéler des convictions religieuses,
+      qui sont des données sensibles au sens de l'article 9 du Règlement général sur la protection des
+      données (RGPD). Elles ne sont traitées qu'avec votre <strong>consentement explicite</strong>, donné
+      en cochant la case prévue à cet effet.
+    </p>
+
+    <h2>Finalités</h2>
+    <ul>
+      <li>Gérer votre préinscription et vous informer des dates, des tarifs et de l'ouverture des inscriptions ;</li>
+      <li>Décider quels cours ouvrir, dans quelles langues et à quels horaires ;</li>
+      <li>Si vous l'avez accepté séparément, vous envoyer les nouvelles de l'Académie.</li>
+    </ul>
+
+    <h2>Base légale</h2>
+    <p>
+      Votre consentement (articles 6.1.a et 9.2.a du RGPD), que vous pouvez retirer à tout moment en nous
+      écrivant. Le retrait ne remet pas en cause les traitements effectués avant lui.
+    </p>
+
+    <h2>Destinataires et sous-traitants</h2>
+    <p>Vos données ne sont ni vendues ni cédées. Elles sont accessibles aux seuls membres de l'association chargés des inscriptions, et confiées à :</p>
+    <ul>
+      <li><strong>Brevo</strong> (Sendinblue SAS, France), qui héberge la liste des préinscrits dans l'Union européenne ;</li>
+      <li><strong>Cloudflare</strong>, qui héberge le site et fournit la vérification anti-robot (Turnstile).</li>
+    </ul>
+
+    <h2>Durée de conservation</h2>
+    <p>
+      Trois ans à compter de votre préinscription ou de votre dernier contact avec l'Académie, puis
+      suppression.
+    </p>
+
+    <h2>Vos droits</h2>
+    <p>
+      Vous pouvez demander l'accès à vos données, leur rectification, leur effacement, la limitation du
+      traitement ou leur portabilité, et vous opposer à leur traitement, en écrivant à
+      <a href={`mailto:${ASSOCIATION.courriel}`}>{ASSOCIATION.courriel}</a>. Vous pouvez aussi adresser
+      une réclamation à la CNIL (<a href="https://www.cnil.fr" rel="noopener">cnil.fr</a>).
+    </p>
+
+    <h2>Cookies et stockage</h2>
+    <p>
+      Le site ne dépose aucun cookie publicitaire ni de mesure d'audience. Il garde seulement dans votre
+      navigateur la liste des cours que vous avez ajoutés, pour la retrouver si vous rechargez la page ;
+      elle est effacée après l'envoi du formulaire. La vérification anti-robot de Cloudflare peut
+      utiliser des données techniques strictement nécessaires à son fonctionnement.
+    </p>
+
+    <p style="margin-top: 36px; font-size: 14px; color: var(--gris)">Version du {VERSION_CONSENTEMENT.split('-').reverse().join('/')}.</p>
+  </article>
+</Base>

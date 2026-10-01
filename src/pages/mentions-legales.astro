@@ -1,0 +1,45 @@
+---
+// Les mentions légales n'existent qu'en français : c'est la langue qui fait foi.
+// Les passages surlignés « À compléter » doivent être remplis AVANT la mise en ligne.
+import Base from '../layouts/Base.astro';
+import { ASSOCIATION } from '../i18n/textes';
+---
+
+<Base langue="fr" titre="Mentions légales — Académie SHS" description="Mentions légales du site academie-shs.fr.">
+  <article class="page-texte">
+    <h1>Mentions légales</h1>
+
+    <h2>Éditeur du site</h2>
+    <p>
+      Le site academie-shs.fr est édité par l'association <strong>{ASSOCIATION.nom}</strong>, association
+      déclarée régie par la loi du 1er juillet 1901.
+    </p>
+    <p>
+      Siège : {ASSOCIATION.adresse}, {ASSOCIATION.ville}, France.<br />
+      SIREN : {ASSOCIATION.siren} — SIRET : 924 544 448 00013.<br />
+      Numéro RNA : <span class="a-completer">À compléter (W76…)</span>.<br />
+      Contact : <a href={`mailto:${ASSOCIATION.courriel}`}>{ASSOCIATION.courriel}</a>.
+    </p>
+
+    <h2>Directeur de la publication</h2>
+    <p><span class="a-completer">À compléter : nom du président de l'association</span>.</p>
+
+    <h2>Hébergement</h2>
+    <p>
+      Cloudflare, Inc., 101 Townsend Street, San Francisco, CA 94107, États-Unis —
+      <a href="https://www.cloudflare.com" rel="noopener">cloudflare.com</a>.
+    </p>
+
+    <h2>Propriété intellectuelle</h2>
+    <p>
+      Les textes, le signe et la présentation du site appartiennent à l'association. Toute reproduction
+      sans autorisation est interdite.
+    </p>
+
+    <h2>Données personnelles</h2>
+    <p>
+      Le traitement des données recueillies par le formulaire de préinscription est décrit dans la
+      <a href="/confidentialite/">politique de confidentialité</a>.
+    </p>
+  </article>
+</Base>

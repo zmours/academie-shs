@@ -1,0 +1,15 @@
+# Dépendances et build
+node_modules/
+dist/
+.astro/
+.wrangler/
+
+# Secrets locaux (clé Brevo, secret Turnstile)
+.env
+.env.*
+!.env.example
+.dev.vars
+
+# Système
+.DS_Store
+*.log
