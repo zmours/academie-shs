@@ -1,4 +1,4 @@
-// Fonction Cloudflare Pages : POST /api/preinscription
+// Traitement de POST /api/preinscription, appelé par le Worker (worker/index.ts).
 //
 // Reçoit le formulaire, vérifie le jeton anti-robot Turnstile, contrôle les champs, puis crée ou
 // met à jour le contact dans la liste Brevo. La clé Brevo ne quitte jamais le serveur.
@@ -10,8 +10,8 @@
 //
 // Aucune donnée personnelle n'est écrite dans les journaux : seulement des codes d'erreur.
 
-import { CODES_COURS } from '../../src/data/cours';
-import { VERSION_CONSENTEMENT } from '../../src/i18n/textes';
+import { CODES_COURS } from '../src/data/cours';
+import { VERSION_CONSENTEMENT } from '../src/i18n/textes';
 
 interface Env {
   BREVO_API_KEY?: string;

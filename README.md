@@ -18,12 +18,12 @@ dans une liste **Brevo**.
 | `src/scripts/preinscription.ts` | sélection des cours, filtres, barre du bas, envoi du formulaire |
 | `src/styles/global.css` | la charte (couleurs, cartes, boutons, version mobile et arabe) |
 | `src/pages/` | les pages : accueils, mentions légales, confidentialité, 404 |
-| `functions/api/preinscription.ts` | fonction Cloudflare qui relaie le formulaire vers Brevo |
+| `worker/` | Worker Cloudflare : `index.ts` aiguille `/api/*`, `preinscription.ts` relaie le formulaire vers Brevo |
 | `public/` | favicon, image de partage, `robots.txt`, en-têtes HTTP |
 | `outils/` | sources HTML des images de `public/` (`npm run images`) |
 | `docs/BREVO.md` | préparer le compte Brevo (liste, attributs, segments) |
 
-Technique : [Astro](https://astro.build) en site statique, hébergé sur **Cloudflare Pages**. Les
+Technique : [Astro](https://astro.build) en site statique, hébergé sur un **Worker Cloudflare**. Les
 polices (Readex Pro, Amiri) sont servies par le site lui-même, pas par Google : aucune donnée de
 visiteur ne part chez un tiers avant l'envoi du formulaire.
 
@@ -39,7 +39,7 @@ Pour tester le formulaire de bout en bout (avec la fonction Cloudflare) :
 
 ```bash
 cp .env.example .dev.vars    # puis y mettre BREVO_API_KEY, BREVO_LIST_ID (et TURNSTILE_SECRET)
-npm run preview:cloudflare   # http://localhost:8788
+npm run preview:cloudflare   # http://localhost:8787
 ```
 
 ⚠️ Avec une vraie clé, ce test écrit un vrai contact dans Brevo : le supprimer ensuite.
@@ -61,56 +61,70 @@ enregistré dans Brevo (`MODULES`), et les segments le cherchent.
 gh repo create zmours/academie-shs --private --source . --push
 ```
 
-### 2. Cloudflare Pages
+### 2. Cloudflare — le Worker
 
-Cloudflare → **Workers & Pages** → Create → Pages → **Connect to Git** → choisir `academie-shs`.
+Le site est un **Worker** Cloudflare avec fichiers statiques (`wrangler.toml`) : les pages de
+`dist/` sont servies telles quelles, et `worker/` ne répond qu'à `/api/*`.
+
+Cloudflare → **Workers & Pages** → Create → **Import a repository** → choisir `academie-shs`.
 
 | Réglage | Valeur |
 |---|---|
-| Framework preset | Astro |
+| Project name | `academie-shs` (doit être identique au `name` de `wrangler.toml`) |
 | Build command | `npm run build` |
-| Build output directory | `dist` |
-| Variable d'environnement `NODE_VERSION` | `24` |
+| Deploy command | `npx wrangler deploy` |
 
-Puis Settings → **Variables and Secrets** (environnement *Production*) :
+Variables, à deux endroits différents :
 
-| Nom | Type | Valeur |
-|---|---|---|
-| `BREVO_API_KEY` | Secret | clé d'API Brevo |
-| `BREVO_LIST_ID` | Texte | numéro de la liste « Préinscriptions 2026-2027 » |
-| `TURNSTILE_SECRET` | Secret | clé secrète Turnstile |
-| `PUBLIC_TURNSTILE_SITE_KEY` | Texte | clé publique Turnstile (lue **au build** : relancer un déploiement après l'avoir ajoutée) |
+| Où | Nom | Type | Valeur |
+|---|---|---|---|
+| Settings → **Variables and Secrets** | `BREVO_API_KEY` | Secret | clé d'API Brevo |
+| Settings → **Variables and Secrets** | `BREVO_LIST_ID` | Texte | `4` (liste « Préinscriptions 2026-2027 ») |
+| Settings → **Variables and Secrets** | `TURNSTILE_SECRET` | Secret | clé secrète Turnstile |
+| Settings → **Build** → Variables and secrets | `PUBLIC_TURNSTILE_SITE_KEY` | Texte | clé publique Turnstile |
 
-Le dossier `functions/` est détecté tout seul : `POST /api/preinscription` existe dès le premier
-déploiement. Chaque `git push` sur `main` redéploie le site.
+`PUBLIC_TURNSTILE_SITE_KEY` est lue **pendant la construction** (elle est écrite dans la page) :
+elle va donc dans les variables *de build*, et il faut relancer une construction après l'avoir
+ajoutée. Les trois autres sont lues par le Worker à chaque préinscription.
+
+Chaque `git push` sur `main` reconstruit et redéploie le site. Les journaux du Worker (erreurs
+Brevo, Turnstile) : Worker → **Observability** → Logs.
 
 ### 3. Turnstile (anti-robot)
 
-Cloudflare → **Turnstile** → Add widget → domaines `academie-shs.fr` et `www.academie-shs.fr`,
-mode *Managed*. Reporter la clé publique et la clé secrète dans les variables ci-dessus.
+Cloudflare → **Turnstile** → Add widget → domaines `academie-shs.fr`, `www.academie-shs.fr` et
+l'adresse `academie-shs.<compte>.workers.dev`, mode *Managed*. Reporter la clé publique et la clé
+secrète dans les variables ci-dessus.
 
 **Ne pas mettre en ligne sans Turnstile** : sans lui, la fonction accepte tout ce qu'on lui envoie
 (elle l'écrit dans ses journaux), et un robot peut remplir la liste Brevo.
 
 ### 4. Brevo
 
-Suivre [`docs/BREVO.md`](docs/BREVO.md) : liste, **attributs à créer avant la mise en ligne**,
-clé d'API.
+Mettre la clé d'API dans `.env` ou `.dev.vars` (`BREVO_API_KEY=xkeysib-...`), puis
+`npm run brevo` : la liste et les **attributs à créer avant la mise en ligne** sont créés d'un
+coup, et le numéro de liste s'affiche. Détail, blocage des adresses IP et segments :
+[`docs/BREVO.md`](docs/BREVO.md).
 
 ### 5. Les domaines (DNS chez LWS)
 
-Cloudflare Pages ne peut servir le domaine nu `academie-shs.fr` que si sa zone DNS est gérée par
-Cloudflare. Pour chaque domaine (`.fr` puis `.com`) :
+Un domaine personnalisé ne se branche sur un Worker que si sa zone DNS est gérée par Cloudflare.
+Pour chaque domaine (`.fr` puis `.com`) :
 
-1. Cloudflare → **Add a site** → `academie-shs.fr`, offre Free. Cloudflare importe les
+1. Cloudflare → **Add a domain** → `academie-shs.fr`, offre Free. Cloudflare importe les
    enregistrements existants.
-2. **Comparer avec la zone LWS avant de basculer**, en particulier les `MX` et `TXT` si une boîte
-   mail est hébergée chez LWS : un enregistrement oublié coupe le courrier le jour du changement.
-3. Chez LWS : Gestion du domaine → **Serveurs DNS** → remplacer par les deux serveurs donnés par
-   Cloudflare. La bascule prend de quelques minutes à 24 h.
-4. Pages → `academie-shs` → **Custom domains** → ajouter `academie-shs.fr` et `www.academie-shs.fr`.
-5. Pour `academie-shs.com` : Rules → **Redirect Rules** → redirection 301 de tout le trafic vers
-   `https://academie-shs.fr` en conservant le chemin.
+2. **Comparer avec la zone LWS avant de basculer.** Les deux domaines ont une messagerie LWS :
+   `MX`, `mail`, `smtp` / `imap` / `pop`, SPF, DKIM (`dkim._domainkey`) et DMARC doivent être
+   recopiés, en **nuage gris** (DNS only). Un enregistrement oublié coupe le courrier.
+3. Chez LWS : Domaines → **Serveurs DNS** → remplacer les serveurs `lwsdns.com` par les deux de
+   Cloudflare (désactiver DNSSEC d'abord s'il est actif). La bascule prend de quelques minutes
+   à 24 h.
+4. Worker `academie-shs` → Settings → **Domains & Routes** → Add → Custom domain :
+   `academie-shs.fr`, puis `www.academie-shs.fr` ; Rules → Redirect Rules → modèle
+   « Redirect from WWW to root ».
+5. Pour `academie-shs.com` : enregistrements A `@` et `www` vers `192.0.2.1` en nuage orange, puis
+   Rules → **Redirect Rules** → URL dynamique `concat("https://academie-shs.fr", http.request.uri.path)`,
+   code 301, paramètres conservés.
 
 ## Avant l'ouverture
 

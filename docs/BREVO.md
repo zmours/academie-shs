@@ -4,6 +4,23 @@ Le formulaire écrit chaque préinscription dans **une liste Brevo**, avec des a
 Brevo **refuse un attribut qui n'existe pas** : il faut les créer tous **avant** la mise en ligne,
 sinon chaque envoi échoue et la personne voit le message d'erreur.
 
+## En une commande
+
+Les étapes 1 et 2 ci-dessous sont automatisées. Créer la clé d'API (étape 4), la mettre dans
+`.dev.vars` (fichier ignoré par git), puis :
+
+```bash
+echo 'BREVO_API_KEY=xkeysib-...' >> .dev.vars   # ou l'écrire dans l'éditeur
+npm run brevo -- --simulation                    # montre ce qui serait créé
+npm run brevo                                    # crée le dossier, la liste et les attributs
+```
+
+Le script ne crée que ce qui manque, ne modifie ni ne supprime rien, et peut être relancé. Il
+affiche à la fin le `BREVO_LIST_ID` à reporter dans Cloudflare. Les segments (étape 3) restent à
+faire à la main : l'API Brevo ne sait pas les créer.
+
+Le détail, pour vérifier ou faire à la main :
+
 ## 1. La liste
 
 Contacts → Listes → **Créer une liste** : « Préinscriptions 2026-2027 ».
@@ -61,6 +78,17 @@ Les codes de cours sont l'`id` de chaque cours dans `src/data/cours.ts` : `fiqh`
 Profil → SMTP et API → **Clés API** → Générer une clé. Elle va dans le secret `BREVO_API_KEY` de
 Cloudflare, **nulle part ailleurs** : ni dans le code, ni dans un fichier commité, ni dans un
 message.
+
+### ⚠️ Le blocage des adresses IP
+
+Brevo refuse par défaut les appels d'API venant d'une adresse IP inconnue (erreur 401
+« unrecognised IP address »). Or la fonction tourne sur les serveurs de Cloudflare, **dont
+l'adresse change d'un appel à l'autre** : on ne peut pas les autoriser une à une. Sans réglage,
+**toutes les préinscriptions échouent en production**.
+
+Sécurité → [IP autorisées](https://app.brevo.com/security/authorised_ips) → **désactiver le
+blocage** des adresses inconnues. La clé reste protégée : elle n'existe que dans les secrets
+Cloudflare et dans le `.env` local, ignoré par git.
 
 ## Ce que fait le formulaire quand une personne se réinscrit
 

@@ -26,4 +26,4 @@ langues : tout texte visible ajouté en français doit l'être aussi en arabe et
 Choisir un cours de sciences islamiques peut révéler une conviction religieuse (art. 9 RGPD) : le
 consentement explicite du formulaire est obligatoire, et la politique de confidentialité
 (`src/pages/confidentialite.astro`) doit décrire ce que fait réellement
-`functions/api/preinscription.ts`. Aucune donnée personnelle dans les journaux de la fonction.
+`worker/preinscription.ts`. Aucune donnée personnelle dans les journaux de la fonction.

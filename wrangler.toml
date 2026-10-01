@@ -1,6 +1,19 @@
-# Configuration Cloudflare Pages (utilisée par `wrangler pages dev` en local).
+# Configuration du Worker Cloudflare : les fichiers de `dist/` (construits par `npm run build`)
+# sont servis tels quels, et le code de `worker/` ne répond qu'aux routes `/api/*`.
+#
 # Les secrets ne vont JAMAIS ici : en local dans `.dev.vars`, en production dans
-# Cloudflare → Pages → academie-shs → Settings → Variables and Secrets.
+# Cloudflare → Workers & Pages → academie-shs → Settings → Variables and Secrets.
+#
+# ⚠️ `name` doit être exactement le nom du Worker dans le tableau de bord Cloudflare.
 name = "academie-shs"
-pages_build_output_dir = "dist"
+main = "worker/index.ts"
 compatibility_date = "2026-10-01"
+
+[assets]
+directory = "./dist"
+binding = "ASSETS"
+not_found_handling = "404-page"
+run_worker_first = ["/api/*"]
+
+[observability]
+enabled = true

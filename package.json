@@ -8,9 +8,10 @@
     "dev": "astro dev",
     "build": "astro build",
     "preview": "astro preview",
-    "preview:cloudflare": "astro build && npx wrangler pages dev dist",
+    "preview:cloudflare": "astro build && npx wrangler dev",
     "check": "astro check",
-    "images": "sh outils/generer-images.sh"
+    "images": "sh outils/generer-images.sh",
+    "brevo": "node outils/preparer-brevo.mjs"
   },
   "dependencies": {
     "@astrojs/sitemap": "^3.7.4",

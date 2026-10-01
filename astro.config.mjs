@@ -2,7 +2,7 @@
 import { defineConfig } from 'astro/config';
 import sitemap from '@astrojs/sitemap';
 
-// Site statique : Cloudflare Pages sert `dist/`, et la fonction `functions/api/preinscription.ts`
+// Site statique : le Worker Cloudflare sert `dist/`, et `worker/preinscription.ts`
 // relaie le formulaire vers Brevo (la clé d'API ne doit jamais arriver dans le navigateur).
 export default defineConfig({
   site: 'https://academie-shs.fr',
