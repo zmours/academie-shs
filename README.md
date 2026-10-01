@@ -79,7 +79,7 @@ Variables, à deux endroits différents :
 | Où | Nom | Type | Valeur |
 |---|---|---|---|
 | Settings → **Variables and Secrets** | `BREVO_API_KEY` | Secret | clé d'API Brevo |
-| Settings → **Variables and Secrets** | `BREVO_LIST_ID` | Texte | `4` (liste « Préinscriptions 2026-2027 ») |
+| `wrangler.toml`, section `[vars]` | `BREVO_LIST_ID` | Texte | `4` — déjà renseigné, ne pas le saisir dans le tableau de bord |
 | Settings → **Variables and Secrets** | `TURNSTILE_SECRET` | Secret | clé secrète Turnstile |
 | Settings → **Build** → Variables and secrets | `PUBLIC_TURNSTILE_SITE_KEY` | Texte | clé publique Turnstile |
 

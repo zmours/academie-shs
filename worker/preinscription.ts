@@ -111,8 +111,9 @@ async function contactExistant(courriel: string, cle: string): Promise<Record<st
 }
 
 export async function onRequestPost({ request, env }: Contexte): Promise<Response> {
-  if (!env.BREVO_API_KEY || !env.BREVO_LIST_ID) {
-    console.error('preinscription: BREVO_API_KEY ou BREVO_LIST_ID absent');
+  const manquantes = (['BREVO_API_KEY', 'BREVO_LIST_ID'] as const).filter((nom) => !env[nom]);
+  if (manquantes.length > 0 || !env.BREVO_API_KEY || !env.BREVO_LIST_ID) {
+    console.error(`preinscription: variable(s) absente(s) : ${manquantes.join(', ')}`);
     return reponse(500, { ok: false, erreur: 'configuration' });
   }
 

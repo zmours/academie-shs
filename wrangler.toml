@@ -9,6 +9,14 @@ name = "academie-shs"
 main = "worker/index.ts"
 compatibility_date = "2026-10-01"
 
+# Sans cette ligne, chaque `wrangler deploy` EFFACE les variables en texte clair saisies dans le
+# tableau de bord (les secrets, eux, sont conservés).
+keep_vars = true
+
+# Variables non secrètes, versionnées ici plutôt que dans le tableau de bord.
+[vars]
+BREVO_LIST_ID = "4"   # liste « Préinscriptions 2026-2027 » du compte Brevo academie-shs
+
 [assets]
 directory = "./dist"
 binding = "ASSETS"
