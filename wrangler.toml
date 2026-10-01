@@ -1,10 +1,12 @@
 # Configuration du Worker Cloudflare : les fichiers de `dist/` (construits par `npm run build`)
-# sont servis tels quels, et le code de `worker/` ne répond qu'aux routes `/api/*`.
+# sont servis par `worker/index.ts`, qui redirige aussi www et traite `/api/preinscription`.
 #
 # Les secrets ne vont JAMAIS ici : en local dans `.dev.vars`, en production dans
 # Cloudflare → Workers & Pages → academie-shs → Settings → Variables and Secrets.
 #
 # ⚠️ `name` doit être exactement le nom du Worker dans le tableau de bord Cloudflare.
+# ⚠️ En TOML, tout ce qui suit un en-tête `[section]` lui appartient : les réglages de premier
+#    niveau (dont `routes`) doivent rester AU-DESSUS du premier `[...]`.
 name = "academie-shs"
 main = "worker/index.ts"
 compatibility_date = "2026-10-01"
@@ -12,6 +14,18 @@ compatibility_date = "2026-10-01"
 # Sans cette ligne, chaque `wrangler deploy` EFFACE les variables en texte clair saisies dans le
 # tableau de bord (les secrets, eux, sont conservés).
 keep_vars = true
+
+# Les adresses du site. Cloudflare crée lui-même l'enregistrement DNS et le certificat de chacune
+# — à condition que la zone soit gérée par ce compte Cloudflare, et qu'aucun enregistrement A,
+# AAAA ou CNAME n'existe déjà pour ce nom. Seule la première sert le site ; les autres sont
+# redirigées vers elle par worker/index.ts.
+#
+# academie-shs.com n'est pas encore chez Cloudflare (DNS chez LWS au 01/10/2026). Le jour où il y
+# passe, ajouter ici `academie-shs.com` et `www.academie-shs.com` : la redirection est déjà prête.
+routes = [
+  { pattern = "academie-shs.fr", custom_domain = true },
+  { pattern = "www.academie-shs.fr", custom_domain = true },
+]
 
 # Variables non secrètes, versionnées ici plutôt que dans le tableau de bord.
 [vars]
@@ -21,7 +35,8 @@ BREVO_LIST_ID = "4"   # liste « Préinscriptions 2026-2027 » du compte Brevo a
 directory = "./dist"
 binding = "ASSETS"
 not_found_handling = "404-page"
-run_worker_first = ["/api/*"]
+# Le Worker voit toutes les requêtes, pour pouvoir rediriger www et le .com.
+run_worker_first = true
 
 [observability]
 enabled = true
