@@ -5,12 +5,16 @@
 //
 // Pas de courriel de confirmation pour l'instant (décision du 01/10/2026). Conséquence : une
 // adresse mal tapée passe inaperçue, et n'importe qui peut préinscrire l'adresse d'un autre. Pour
-// ne rien écraser dans ce cas, les cours, langues et créneaux d'un contact existant sont FUSIONNÉS
-// avec les nouveaux, jamais remplacés.
+// ne rien écraser dans ce cas, le cursus et les créneaux d'un contact existant sont
+// FUSIONNÉS avec les nouveaux, jamais remplacés.
+//
+// Depuis le 11/10/2026, on se préinscrit au cursus complet : `MODULES` reçoit `CODE_CURSUS`, et
+// garde les codes de cours des préinscriptions plus anciennes. Les cours sont en français seulement :
+// la langue n'est plus demandée, et `LANGUE_COURS` garde ce qu'avaient choisi les plus anciens.
 //
 // Aucune donnée personnelle n'est écrite dans les journaux : seulement des codes d'erreur.
 
-import { CODES_COURS } from '../src/data/cours';
+import { CODE_CURSUS } from '../src/data/cours';
 import { VERSION_CONSENTEMENT } from '../src/i18n/textes';
 
 interface Env {
@@ -34,8 +38,6 @@ interface Charge {
   pays?: unknown;
   niveau?: unknown;
   origine?: unknown;
-  modules?: unknown;
-  langues?: unknown;
   creneaux?: unknown;
   majeur?: unknown;
   consentement?: unknown;
@@ -54,7 +56,7 @@ const NIVEAUX = new Set(['debutant', 'intermediaire', 'avance', 'ne-sait-pas']);
 const PAYS = new Set(['FR', 'BE', 'CH', 'CA', 'GB', 'MA', 'DZ', 'TN', 'AUTRE']);
 const ORIGINES = new Set(['', 'whatsapp', 'instagram', 'facebook', 'bouche-a-oreille', 'mosquee-association', 'autre']);
 const COURRIEL = /^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/;
-/** Les listes sont enregistrées dans Brevo sous la forme « fiqh, sira » (attribut texte). */
+/** Les listes sont enregistrées dans Brevo sous la forme « fr, ar » (attribut texte). */
 const SEPARATEUR = ', ';
 
 function reponse(statut: number, corps: Record<string, unknown>): Response {
@@ -145,8 +147,6 @@ export async function onRequestPost({ request, env }: Contexte): Promise<Respons
   const nom = texte(charge.nom, 80);
   const courriel = texte(charge.courriel, 160).toLowerCase();
   const whatsapp = telephone(charge.whatsapp);
-  const modules = liste(charge.modules, CODES_COURS);
-  const langues = liste(charge.langues, LANGUES);
   const creneaux = liste(charge.creneaux, CRENEAUX);
 
   const champsManquants = [
@@ -154,8 +154,6 @@ export async function onRequestPost({ request, env }: Contexte): Promise<Respons
     !nom && 'nom',
     !COURRIEL.test(courriel) && 'courriel',
     whatsapp.replace('+', '').length < 8 && 'whatsapp',
-    modules.length === 0 && 'modules',
-    langues.length === 0 && 'langues',
     charge.majeur !== true && 'majeur',
     charge.consentement !== true && 'consentement',
   ].filter(Boolean);
@@ -177,8 +175,7 @@ export async function onRequestPost({ request, env }: Contexte): Promise<Respons
     TELEPHONE_WHATSAPP: whatsapp,
     PAYS: choix(charge.pays, PAYS),
     NIVEAU: choix(charge.niveau, NIVEAUX),
-    MODULES: fusionner(existant?.MODULES, modules),
-    LANGUE_COURS: fusionner(existant?.LANGUE_COURS, langues),
+    MODULES: fusionner(existant?.MODULES, [CODE_CURSUS]),
     CRENEAUX: fusionner(existant?.CRENEAUX, creneaux),
     ORIGINE: choix(charge.origine, ORIGINES),
     LANGUE_SITE: choix(charge.langueSite, LANGUES),

@@ -3,28 +3,32 @@
 Site de préinscription de l'**Académie française des sciences humaines et sociales**
 (association loi 1901, SIREN 924 544 448) : <https://academie-shs.fr>.
 
-Trois pages d'accueil (français `/`, arabe `/ar/`, anglais `/en/`) présentent les 13 cours. Le
-visiteur ajoute des cours depuis le catalogue, remplit le formulaire, et sa préinscription arrive
-dans une liste **Brevo**.
+La page d'accueil, **en français seulement** depuis le 11/10/2026 (`/ar/` et `/en/` redirigent
+vers elle), présente le cursus
+« Études islamiques et sociales » en trois ans, l'expérience des cours en ligne et le programme
+année par année. Le visiteur se préinscrit **au cursus complet** (plus de cours à choisir depuis le
+11/10/2026), et sa préinscription arrive dans une liste **Brevo**.
 
 ## Ce qu'il y a dedans
 
 | Chemin | Rôle |
 |---|---|
-| `src/data/cours.ts` | **le catalogue** : pôles et cours, dans les trois langues |
-| `src/i18n/textes.ts` | tous les autres textes du site, dans les trois langues |
-| `src/components/Accueil.astro` | la page d'accueil (identique dans les trois langues) |
+| `src/data/cours.ts` | **le programme**, mot pour mot celui de l'association, et le code du cursus enregistré dans Brevo |
+| `src/i18n/textes.ts` | tous les autres textes du site (français publié ; arabe et anglais gardés pour plus tard) |
+| `src/components/Accueil.astro` | la page d'accueil |
+| `src/components/Experience.astro` | la section « Cours en ligne » et ses écrans dessinés en HTML et CSS |
 | `src/layouts/Base.astro` | en-tête, pied de page, balises de partage et de référencement |
-| `src/scripts/preinscription.ts` | sélection des cours, filtres, barre du bas, envoi du formulaire |
+| `src/scripts/preinscription.ts` | envoi du formulaire |
+| `src/scripts/interactions.ts` | en-tête, onglets (années, cours en ligne), apparition des sections |
 | `src/styles/global.css` | la charte (couleurs, cartes, boutons, version mobile et arabe) |
-| `src/pages/` | les pages : accueils, mentions légales, confidentialité, 404 |
+| `src/pages/` | les pages : accueil, mentions légales, confidentialité, 404 |
 | `worker/` | Worker Cloudflare : `index.ts` aiguille `/api/*`, `preinscription.ts` relaie le formulaire vers Brevo |
 | `public/` | favicon, image de partage, `robots.txt`, en-têtes HTTP |
 | `outils/` | sources HTML des images de `public/` (`npm run images`) |
 | `docs/BREVO.md` | préparer le compte Brevo (liste, attributs, segments) |
 
 Technique : [Astro](https://astro.build) en site statique, hébergé sur un **Worker Cloudflare**. Les
-polices (Readex Pro, Amiri) sont servies par le site lui-même, pas par Google : aucune donnée de
+polices (Schibsted Grotesk, Readex Pro, Noto Naskh Arabic) sont servies par le site lui-même, pas par Google : aucune donnée de
 visiteur ne part chez un tiers avant l'envoi du formulaire.
 
 ## Travailler en local
@@ -44,14 +48,21 @@ npm run preview:cloudflare   # http://localhost:8787
 
 ⚠️ Avec une vraie clé, ce test écrit un vrai contact dans Brevo : le supprimer ensuite.
 
-## Modifier un cours
+## Modifier le programme
 
-Tout se passe dans `src/data/cours.ts`. Ajouter un cours = ajouter un objet au tableau `COURS`,
-avec ses textes en français, en arabe et en anglais. La page, le formulaire et la fonction le
-prennent en compte d'eux-mêmes.
+Tout se passe dans `src/data/cours.ts` : une année = un objet du tableau `ANNEES`, une matière = un
+objet de son tableau `matieres`. La source est `cursus.md`, le document de l'association : le
+recopier tel quel (le travail de fin d'études et les compétences acquises sont dans le même
+fichier, `FIN_ETUDES` et `COMPETENCES`).
 
-**Ne jamais changer l'`id` d'un cours qui a déjà des préinscrits** : c'est ce code qui est
+**Ne jamais changer `CODE_CURSUS`** une fois des préinscriptions reçues : c'est ce code qui est
 enregistré dans Brevo (`MODULES`), et les segments le cherchent.
+
+## Les photos
+
+Les photos de `public/photos/` sont **provisoires** (domaine public ou CC0) et marquées comme telles
+sur la page. Leur provenance est dans [`docs/PHOTOS.md`](docs/PHOTOS.md). Pour en remplacer une,
+garder le même nom de fichier (format WebP, 1 000 à 1 200 px de large).
 
 ## Mettre en ligne
 
@@ -131,6 +142,6 @@ Pour chaque domaine (`.fr` puis `.com`) :
 - [ ] Mentions légales : renseigner le **numéro RNA** et le **directeur de la publication**
       (`src/pages/mentions-legales.astro`, passages surlignés « À compléter »).
 - [ ] Créer la boîte `contact@academie-shs.fr`, citée partout sur le site.
-- [ ] Faire relire les textes arabes et anglais (`src/data/cours.ts`, `src/i18n/textes.ts`).
+- [ ] Remplacer les photos provisoires, `calligraphie.webp` en premier (`docs/PHOTOS.md`).
 - [ ] Attributs Brevo créés, Turnstile branché, une préinscription de test reçue puis supprimée.
 - [ ] Partager le lien dans WhatsApp pour vérifier l'aperçu (`public/og-image.jpg`).

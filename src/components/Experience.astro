@@ -1,0 +1,155 @@
+---
+// « Cours en ligne » : quatre atouts, chacun montre une scène de l'espace de cours, dessinée en
+// HTML et CSS (aucune capture d'écran). Ne montrer QUE ce que l'outil fait réellement : pas de
+// reprise d'une rediffusion à la seconde près, pas de rappel avant le cours.
+import type { Langue } from '../data/cours';
+import { TEXTES } from '../i18n/textes';
+
+interface Props {
+  langue: Langue;
+}
+
+const { langue } = Astro.props;
+const t = TEXTES[langue].enligne;
+const s = t.scenes;
+const SCENES = ['classe', 'accueil', 'replay', 'espace'] as const;
+const ICONES = [
+  '<rect x="2" y="5" width="14" height="14" rx="3"/><path d="M16 10l6-3v10l-6-3"/>',
+  '<rect x="3" y="4" width="18" height="17" rx="3"/><path d="M3 9h18M8 2v4M16 2v4"/>',
+  '<path d="M3 12a9 9 0 1 0 3-6.7L3 8"/><path d="M3 3v5h5"/><path d="M10 9l5 3-5 3z"/>',
+  '<path d="M4 4h10l6 6v10H4z"/><path d="M14 4v6h6M8 14h8M8 18h5"/>',
+];
+const ondes = Array.from({ length: 30 }, (_, i) => Math.round(25 + Math.abs(Math.sin(i * 1.7)) * 75));
+---
+
+<section class="cadre enligne apparait" id="enligne">
+  <div class="enligne__grille">
+    <div>
+      <p class="surtitre">{t.surtitre}</p>
+      <h2>{t.titre}</h2>
+      <p class="enligne__intro">{t.intro}</p>
+      <div class="atouts" role="tablist" aria-orientation="vertical" data-onglets="enligne">
+        {
+          t.atouts.map((a, i) => (
+            <button
+              type="button"
+              role="tab"
+              class="atout"
+              id={`onglet-${SCENES[i]}`}
+              aria-controls="enligne-ecran"
+              aria-selected={i === 0 ? 'true' : 'false'}
+              tabindex={i === 0 ? 0 : -1}
+              data-scene={SCENES[i]}
+            >
+              <span class="atout__icone" aria-hidden="true">
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" set:html={ICONES[i]} />
+              </span>
+              <b>{a.titre}</b>
+              <span>{a.texte}</span>
+            </button>
+          ))
+        }
+      </div>
+      <p class="appareils">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="7" y="2" width="10" height="20" rx="2"></rect><path d="M11 18h2"></path></svg>
+        {t.appareils}
+      </p>
+    </div>
+
+    <div class="scene-cadre">
+      <div class="ecran" id="enligne-ecran" role="tabpanel" aria-labelledby="onglet-classe">
+        <div class="ecran__barre" aria-hidden="true"><i></i><i></i><i></i></div>
+        <div class="ecran__vue" role="img" aria-label={t.illustration}>
+          <div class="scene s-classe est-visible" data-scene-vue="classe" aria-hidden="true">
+            <div class="s-haut"><span class="s-direct"><i></i>{s.classe.direct}</span><span>{s.classe.titre}</span><span class="s-chrono">00:42</span></div>
+            <div class="s-tableau">
+              <span class="ar" lang="ar">مصادر التشريع</span>
+              <b>{s.classe.tableau}</b>
+              <i class="s-ligne" style="width:58%"></i><i class="s-ligne s-ligne--surligne"></i><i class="s-ligne" style="width:52%"></i><i class="s-ligne" style="width:44%"></i>
+              <div class="s-sondage">
+                <small>{s.classe.sondage}</small>
+                <b>{s.classe.question}</b>
+                <div class="s-choix"><span>{s.classe.oui}</span><span>78 %</span><i style="--p:78%"></i></div>
+                <div class="s-choix"><span>{s.classe.non}</span><span>22 %</span><i style="--p:22%"></i></div>
+              </div>
+              <div class="s-prof"><img src="/photos/lecture.webp" alt="" loading="lazy" /></div>
+            </div>
+            <div class="s-cote">
+              <div class="s-video parle"><b style="background:#F0A830">SA</b><small>Sarah</small></div>
+              <div class="s-video"><b style="background:#CBDAC7">YB</b><small>Youssef</small><span class="s-main">✋ {s.classe.main}</span></div>
+              <div class="s-video"><b style="background:#E7C9A9">ML</b><small>Mariam</small></div>
+            </div>
+            <div class="s-controles">
+              <span><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><rect x="9" y="2" width="6" height="12" rx="3"></rect><path d="M5 11a7 7 0 0 0 14 0M12 18v4"></path></svg></span>
+              <span><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="6" width="13" height="12" rx="2"></rect><path d="M15 10l7-3v10l-7-3"></path></svg></span>
+              <span class="actif">✋</span>
+              <span>👏</span>
+              <span class="quitter"></span>
+            </div>
+          </div>
+
+          <div class="scene s-accueil" data-scene-vue="accueil" aria-hidden="true">
+            <b class="s-titre">{s.accueil.bonjour}</b>
+            <div class="s-prochaine">
+              <small>{s.accueil.quand}</small>
+              <strong>{s.accueil.cours}</strong>
+              <span class="s-etat"><i></i>{s.accueil.ouverture}</span>
+              <span class="s-rejoindre">{s.accueil.rejoindre}</span>
+            </div>
+            <div class="s-carte">
+              <small>{s.accueil.semaine}</small>
+              {
+                s.accueil.jours.map((j, i) => (
+                  <div class="s-jour"><i>{j}</i><span>{s.accueil.lignes[i]}</span>{i === 2 ? <em>{s.accueil.aRendre}</em> : <span />}</div>
+                ))
+              }
+            </div>
+            <div class="s-carte">
+              <small>{s.accueil.mesCours}</small>
+              <div class="s-cours"><b>{s.accueil.lignes[0]}</b><div><i style="width:66%"></i></div><small>{s.accueil.suivies}</small></div>
+            </div>
+          </div>
+
+          <div class="scene s-replay" data-scene-vue="replay" aria-hidden="true">
+            <div class="s-lecteur">
+              <div class="s-lecteur__image"><span class="ar" lang="ar">السيرة النبوية</span><span class="s-play"><svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor"><path d="M7 4l13 8-13 8z"></path></svg></span></div>
+              <div class="s-progression">
+                <b>{s.replay.titre}</b>
+                <div class="s-piste"><i></i></div>
+                <div class="s-temps"><span>32:10</span><span class="s-boutons"><span>−10 s</span><span>+10 s</span><span class="vitesse">×1,25</span></span><span>1:24:05</span></div>
+              </div>
+            </div>
+            <div class="s-liste">
+              <small>{s.replay.liste}</small>
+              <div class="s-episode actif"><i></i><span><b>{s.replay.titre}</b><small class="rattraper">{s.replay.rattraper}</small></span></div>
+              {s.replay.autres.map((e) => <div class="s-episode"><i></i><span><b>{e}</b><small>1 h 20</small></span></div>)}
+            </div>
+          </div>
+
+          <div class="scene s-espace" data-scene-vue="espace" aria-hidden="true">
+            <div class="s-espace__tete"><i>ح</i><div><b>{s.espace.cours}</b><small>{s.espace.groupe}</small></div></div>
+            <div class="s-colonne">
+              {s.espace.docs.map((d, i) => <div class="s-doc"><i>{i === 2 ? 'MP3' : 'PDF'}</i><span><b>{d}</b><small>{s.espace.seance} {3 - Math.floor(i / 2)}</small></span></div>)}
+              <div class="s-rendu"><b>{s.espace.rendu}</b><div class="s-audio">{ondes.map((h) => <span style={`height:${h}%`} />)}</div><small>{s.espace.vocal}</small></div>
+            </div>
+            <div class="s-colonne">
+              <div class="s-post"><header><i>EN</i><b>{s.espace.prof}</b></header><p>{s.espace.message}</p><div class="s-reactions"><span>👍 12</span><span>💬 4</span></div></div>
+              <span class="s-question">{s.espace.question}</span>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="telephone" aria-hidden="true">
+        <div class="telephone__vue">
+          <div class="telephone__heure">20:17</div>
+          {
+            s.notifications.map(([titre, detail]) => (
+              <div class="notif"><i>ع</i><b>{titre}</b><span>{detail}</span></div>
+            ))
+          }
+        </div>
+      </div>
+    </div>
+  </div>
+</section>

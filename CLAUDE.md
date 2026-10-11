@@ -9,21 +9,28 @@ ou un « vas-y » sur une proposition de travail autorise à coder, pas à commi
 
 ## Langue
 
-Documentation, commentaires de code et messages de commit en **français**. Le site existe en trois
-langues : tout texte visible ajouté en français doit l'être aussi en arabe et en anglais
-(`src/data/cours.ts`, `src/i18n/textes.ts`).
+Documentation, commentaires de code et messages de commit en **français**. Depuis le 11/10/2026,
+le site n'est publié **qu'en français** (cours en français seulement) : les textes arabes et anglais
+de `src/data/cours.ts` et `src/i18n/textes.ts` sont gardés pour plus tard mais ne sont plus tenus à
+jour. `/ar/` et `/en/` redirigent vers l'accueil (`worker/index.ts`).
 
 ## Règles du contenu
 
 - Jamais « diplôme », « licence », « master » ni « université » (Code de l'éducation,
   art. L731-14) : on écrit « certificat de l'Académie », « attestation de suivi ».
 - Ni date, ni tarif, ni nom d'enseignant tant que l'association ne les a pas fixés.
-- L'`id` d'un cours est enregistré dans Brevo : ne jamais le changer pour un cours qui a des
-  préinscrits.
+- Le programme (`src/data/cours.ts`) reprend **mot pour mot** `cursus.md`, le document de
+  l'association : ne rien reformuler, ne rien ajouter. L'introduction et les objectifs généraux
+  aussi (`src/i18n/textes.ts`). Seule exception : « étudiant » devient « apprenant ».
+- `CODE_CURSUS` (`src/data/cours.ts`) est enregistré dans Brevo : ne jamais le changer une fois
+  des préinscriptions reçues.
+- La section « Cours en ligne » ne montre que ce que l'outil de cours fait réellement (pas de
+  reprise d'une rediffusion à la seconde près, pas de rappel avant le cours). Ne pas nommer l'outil.
+- Peu d'animation : apparitions discrètes et onglets. Rien qui défile ou bouge seul.
 
 ## Données personnelles
 
-Choisir un cours de sciences islamiques peut révéler une conviction religieuse (art. 9 RGPD) : le
+Se préinscrire à un cursus d'études islamiques peut révéler une conviction religieuse (art. 9 RGPD) : le
 consentement explicite du formulaire est obligatoire, et la politique de confidentialité
 (`src/pages/confidentialite.astro`) doit décrire ce que fait réellement
 `worker/preinscription.ts`. Aucune donnée personnelle dans les journaux de la fonction.

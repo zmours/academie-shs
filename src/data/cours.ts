@@ -1,335 +1,192 @@
-// Le catalogue : la SEULE source des cours, lue par les trois pages ET par la fonction qui
-// relaie le formulaire vers Brevo. Pour ajouter, retirer ou renommer un cours, c'est ici.
+// Le programme du cursus : la SEULE source des matières, lue par la page d'accueil.
+// Il reprend MOT POUR MOT `cursus.md`, le document transmis par l'association : ne rien
+// reformuler, ne rien ajouter. Seule exception : « étudiant » devient « apprenant », l'association
+// n'étant pas déclarée au rectorat (Code de l'éducation, art. L731-1 et suivants).
 //
-// ⚠️ L'`id` est le code envoyé dans l'attribut Brevo `MODULES` : ne jamais le changer pour un
-// cours qui a déjà reçu des préinscriptions, sinon les segments Brevo ne le retrouvent plus.
-// Un `id` ne doit pas non plus en contenir un autre (`fiqh` / `fiqh2`) : les segments Brevo
-// filtrent par « contient ».
+// Le site n'est publié qu'en français depuis le 11/10/2026. Les textes arabes et anglais déjà écrits
+// sont gardés pour plus tard ; les matières ajoutées depuis n'en ont pas.
+//
+// On se préinscrit au cursus complet : la fonction qui relaie le formulaire enregistre
+// `CODE_CURSUS` dans l'attribut Brevo `MODULES`.
 
 export type Langue = 'fr' | 'ar' | 'en';
 export type Traduit = Record<Langue, string>;
-export type CodePole = 'A' | 'B' | 'C';
+/** Texte en français, traductions facultatives tant que le site n'est publié qu'en français. */
+export type TexteFr = { fr: string } & Partial<Record<Exclude<Langue, 'fr'>, string>>;
 
-export interface Pole {
-  code: CodePole;
-  couleur: string;
-  degrade: string;
+/**
+ * Code enregistré dans l'attribut Brevo `MODULES` pour toute préinscription au cursus.
+ * ⚠️ Ne jamais le changer une fois des préinscriptions reçues : les segments Brevo le cherchent.
+ */
+export const CODE_CURSUS = 'cursus-eis';
+
+export interface Matiere {
+  /** Nom arabe affiché sur la fiche de la matière. */
+  arabe: string;
+  titre: TexteFr;
+  /** Contenu de la matière, quand le programme le précise. */
+  detail?: TexteFr;
+}
+
+export interface Annee {
+  numero: 1 | 2 | 3;
   nom: Traduit;
+  /** Photo d'illustration, dans `public/photos/`. */
+  photo: string;
+  matieres: Matiere[];
 }
 
-export interface Cours {
-  id: string;
-  pole: CodePole;
-  /** Mot arabe affiché en filigrane sur la carte. */
-  mot: string;
-  /** Libellé court : pastilles du formulaire, barre de sélection. */
-  court: Traduit;
-  titre: Traduit;
-  niveau: Traduit;
-  description: Traduit;
-  reference: Traduit;
-}
-
-export const POLES: Record<CodePole, Pole> = {
-  A: {
-    code: 'A',
-    couleur: '#059669',
-    degrade: 'linear-gradient(135deg, #064E3B 0%, #059669 100%)',
-    nom: { fr: 'Sciences islamiques', ar: 'العلوم الإسلامية', en: 'Islamic Sciences' },
-  },
-  B: {
-    code: 'B',
-    couleur: '#7C3AED',
-    degrade: 'linear-gradient(135deg, #3B0F7A 0%, #7C3AED 100%)',
-    nom: { fr: 'Théologie et philosophie', ar: 'الإلهيات والفلسفة', en: 'Theology and Philosophy' },
-  },
-  C: {
-    code: 'C',
-    couleur: '#EA580C',
-    degrade: 'linear-gradient(135deg, #8A2C0B 0%, #EA580C 100%)',
-    nom: {
-      fr: 'Sciences humaines et sociales',
-      ar: 'العلوم الإنسانية والاجتماعية',
-      en: 'Humanities and Social Sciences',
-    },
-  },
-};
-
-const DEBUTANT: Traduit = { fr: 'Débutant', ar: 'مبتدئ', en: 'Beginner' };
-const INTERMEDIAIRE: Traduit = { fr: 'Intermédiaire', ar: 'متوسط', en: 'Intermediate' };
-const TOUS_NIVEAUX: Traduit = { fr: 'Tous niveaux', ar: 'لجميع المستويات', en: 'All levels' };
-
-export const COURS: Cours[] = [
+export const ANNEES: Annee[] = [
   {
-    id: 'fiqh',
-    pole: 'A',
-    mot: 'فقه',
-    court: { fr: 'Fiqh malikite', ar: 'الفقه المالكي', en: 'Maliki law' },
-    titre: {
-      fr: 'Fiqh malikite (niveaux I et II)',
-      ar: 'الفقه المالكي (المستويان الأول والثاني)',
-      en: 'Maliki Jurisprudence (Levels I and II)',
-    },
-    niveau: { fr: 'Débutant → intermédiaire', ar: 'مبتدئ ← متوسط', en: 'Beginner → intermediate' },
-    description: {
-      fr: 'La purification et la prière, puis le jeûne, la zakât et le pèlerinage, selon l’école de l’imam Mâlik.',
-      ar: 'الطهارة والصلاة، ثم الصيام والزكاة والحج، على مذهب الإمام مالك.',
-      en: 'Purification and prayer, then fasting, zakat and pilgrimage, according to the school of Imam Malik.',
-    },
-    reference: {
-      fr: 'Matn al-Akhḍarī ; al-Murshid al-Muʿīn (Ibn ʿĀshir)',
-      ar: 'متن الأخضري · المرشد المعين لابن عاشر',
-      en: 'Matn al-Akhḍarī; al-Murshid al-Muʿīn (Ibn ʿĀshir)',
-    },
-  },
-  {
-    id: 'sira',
-    pole: 'A',
-    mot: 'سيرة',
-    court: { fr: 'Sîra', ar: 'السيرة', en: 'Sīra' },
-    titre: { fr: 'Sîra prophétique', ar: 'السيرة النبوية', en: 'The Life of the Prophet (Sīra)' },
-    niveau: TOUS_NIVEAUX,
-    description: {
-      fr: 'La vie du Prophète ﷺ, de La Mecque à Médine, et les leçons qu’on en tire aujourd’hui.',
-      ar: 'حياة النبي ﷺ من مكة إلى المدينة، والعبر المستفادة منها اليوم.',
-      en: 'The life of the Prophet ﷺ, from Mecca to Medina, and the lessons it holds today.',
-    },
-    reference: {
-      fr: 'Sīrat Ibn Hishām ; Fiqh as-Sīra (al-Būṭī)',
-      ar: 'سيرة ابن هشام · فقه السيرة للبوطي',
-      en: 'Sīrat Ibn Hishām; Fiqh as-Sīra (al-Būṭī)',
-    },
+    numero: 1,
+    nom: { fr: 'Première année', ar: 'السنة الأولى', en: 'First year' },
+    photo: '/photos/boukhara.webp',
+    matieres: [
+      {
+        arabe: 'علوم القرآن',
+        titre: {
+          fr: 'Introduction aux sciences du Coran (ʿUlūm al-Qurʾān)',
+          ar: 'مدخل إلى علوم القرآن',
+          en: 'Introduction to the Qur’anic Sciences',
+        },
+        detail: {
+          fr: 'Révélation, compilation, lectures (qirāʾāt), abrogation.',
+          ar: 'الوحي، والجمع، والقراءات، والناسخ والمنسوخ.',
+          en: 'Revelation, compilation, readings (qirāʾāt), abrogation.',
+        },
+      },
+      {
+        arabe: 'علوم الحديث',
+        titre: {
+          fr: 'Introduction aux sciences du hadith',
+          ar: 'مدخل إلى علوم الحديث',
+          en: 'Introduction to the Hadith Sciences',
+        },
+        detail: {
+          fr: 'Terminologie, classification, transmission.',
+          ar: 'المصطلح، والتصنيف، والرواية.',
+          en: 'Terminology, classification, transmission.',
+        },
+      },
+      {
+        arabe: 'السيرة النبوية',
+        titre: { fr: 'Sīra du Prophète (biographie prophétique)', ar: 'السيرة النبوية', en: 'The Life of the Prophet (Sīra)' },
+      },
+      {
+        arabe: 'أصول الفقه',
+        titre: {
+          fr: 'Fondements du droit musulman « Uṣūl al-fiqh » – 1ʳᵉ partie',
+          ar: 'أصول الفقه، الجزء الأول',
+          en: 'Principles of Islamic Law (uṣūl al-fiqh), Part 1',
+        },
+      },
+      {
+        arabe: 'السياق التاريخي',
+        titre: {
+          fr: 'Contexte historique et enseignements spirituels et sociaux',
+          ar: 'السياق التاريخي والتوجيهات الروحية والاجتماعية',
+          en: 'Historical Context, Spiritual and Social Teachings',
+        },
+      },
+      {
+        arabe: 'فقه العبادات',
+        titre: {
+          fr: 'Fiqh des actes d’adoration (ʿibādāt)',
+          ar: 'فقه العبادات',
+          en: 'Jurisprudence of Worship (ʿibādāt)',
+        },
+        detail: {
+          fr: 'Purification, prière, jeûne, zakāt, pèlerinage. (Mémorisation d’Ibn ʿĀshir partiellement)',
+          ar: 'الطهارة، والصلاة، والصيام، والزكاة، والحج، مع حفظ جزء من متن ابن عاشر.',
+          en: 'Purification, prayer, fasting, zakat, pilgrimage. (Partial memorisation of Ibn ʿĀshir)',
+        },
+      },
+      {
+        arabe: 'علم الاجتماع',
+        titre: { fr: 'Introduction à la sociologie', ar: 'مدخل إلى علم الاجتماع', en: 'Introduction to Sociology' },
+        detail: {
+          fr: 'Concepts fondamentaux : socialisation, institutions, normes.',
+          ar: 'المفاهيم الأساسية: التنشئة الاجتماعية، والمؤسسات، والمعايير.',
+          en: 'Core concepts: socialisation, institutions, norms.',
+        },
+      },
+    ],
   },
   {
-    id: 'aqida',
-    pole: 'A',
-    mot: 'عقيدة',
-    court: { fr: 'ʿAqîda', ar: 'العقيدة', en: 'ʿAqīda' },
-    titre: {
-      fr: 'Théologie islamique (ʿaqîda) : les fondements',
-      ar: 'مبادئ علم العقيدة',
-      en: 'Islamic Theology (ʿAqīda): Foundations',
-    },
-    niveau: DEBUTANT,
-    description: {
-      fr: 'Ce qu’il faut croire au sujet de Dieu et des prophètes, expliqué pas à pas.',
-      ar: 'ما يجب اعتقاده في حقّ الله تعالى وفي حقّ الأنبياء، خطوة بخطوة.',
-      en: 'What Muslims believe about God and the prophets, explained step by step.',
-    },
-    reference: {
-      fr: 'Umm al-Barāhīn (as-Sanūsī)',
-      ar: 'أمّ البراهين للسنوسي',
-      en: 'Umm al-Barāhīn (as-Sanūsī)',
-    },
+    numero: 2,
+    nom: { fr: 'Deuxième année', ar: 'السنة الثانية', en: 'Second year' },
+    photo: '/photos/mosquee.webp',
+    matieres: [
+      {
+        arabe: 'أصول الفقه',
+        titre: { fr: 'Uṣūl al-fiqh (fondements de la jurisprudence)' },
+        detail: { fr: 'Sources du droit, raisonnement juridique.' },
+      },
+      {
+        arabe: 'فقه المعاملات',
+        titre: { fr: 'Fiqh des transactions (muʿāmalāt)' },
+        detail: { fr: 'Commerce, contrats, finance.' },
+      },
+      {
+        arabe: 'علوم الحديث',
+        titre: { fr: 'Sciences du hadith (niveau avancé)' },
+        detail: { fr: 'Critique des chaînes de transmission.' },
+      },
+      { arabe: 'مقاصد الشريعة', titre: { fr: 'Maqāṣid al-Sharīʿa (objectifs de la loi islamique)' } },
+      { arabe: 'التزكية', titre: { fr: 'Purification « Tazkiya »' } },
+      { arabe: 'علم اجتماع الأديان', titre: { fr: 'Sociologie des religions' } },
+      { arabe: 'الفقه المقارن', titre: { fr: 'Jurisprudence comparée « al-fiqh al-muqāran »' } },
+      { arabe: 'الشعائر والجمعيات', titre: { fr: 'Droit des cultes et associations (loi 1901, loi 1905)' } },
+      { arabe: 'التيارات الفكرية', titre: { fr: 'Courants de pensée modernes' } },
+    ],
   },
   {
-    id: 'coran',
-    pole: 'A',
-    mot: 'قرآن',
-    court: { fr: 'Sciences du Coran', ar: 'علوم القرآن', en: 'Qur’anic sciences' },
-    titre: { fr: 'Sciences du Coran', ar: 'علوم القرآن', en: 'Qur’anic Sciences' },
-    niveau: INTERMEDIAIRE,
-    description: {
-      fr: 'La révélation, la compilation, les causes de la révélation et les grandes méthodes d’exégèse.',
-      ar: 'الوحي والجمع وأسباب النزول ومناهج التفسير الكبرى.',
-      en: 'Revelation, compilation, occasions of revelation and the major methods of exegesis.',
-    },
-    reference: {
-      fr: 'Al-Itqān (as-Suyūṭī), version simplifiée',
-      ar: 'الإتقان للسيوطي، بصيغة ميسّرة',
-      en: 'Al-Itqān (as-Suyūṭī), simplified',
-    },
-  },
-  {
-    id: 'hadith',
-    pole: 'A',
-    mot: 'حديث',
-    court: { fr: 'Hadith', ar: 'الحديث', en: 'Hadith' },
-    titre: { fr: 'Le hadith et sa terminologie', ar: 'الحديث ومصطلحه', en: 'Hadith and Its Terminology' },
-    niveau: INTERMEDIAIRE,
-    description: {
-      fr: 'Les quarante hadiths de l’imam an-Nawawî commentés, et les bases de la critique du hadith.',
-      ar: 'شرح الأربعين النووية، ومبادئ علم مصطلح الحديث.',
-      en: 'Imam an-Nawawī’s Forty Hadith with commentary, and the basics of hadith criticism.',
-    },
-    reference: {
-      fr: 'Al-Arbaʿūn (an-Nawawī) ; al-Bayqūniyya',
-      ar: 'الأربعون النووية · المنظومة البيقونية',
-      en: 'Al-Arbaʿūn (an-Nawawī); al-Bayqūniyya',
-    },
-  },
-  {
-    id: 'tajwid',
-    pole: 'A',
-    mot: 'تجويد',
-    court: { fr: 'Tajwîd', ar: 'التجويد', en: 'Tajwīd' },
-    titre: {
-      fr: 'Tajwîd : la récitation du Coran',
-      ar: 'التجويد برواية ورش أو حفص',
-      en: 'Tajwīd: Qur’anic Recitation',
-    },
-    niveau: TOUS_NIVEAUX,
-    description: {
-      fr: 'Les règles de la récitation, avec correction en direct par l’enseignant.',
-      ar: 'أحكام التلاوة، مع تصحيح مباشر من الأستاذ.',
-      en: 'The rules of recitation, with live correction by the teacher.',
-    },
-    reference: {
-      fr: 'Tuḥfat al-Aṭfāl ; ad-Durar al-Lawāmiʿ (Ibn Barrī)',
-      ar: 'تحفة الأطفال · الدرر اللوامع لابن برّي',
-      en: 'Tuḥfat al-Aṭfāl; ad-Durar al-Lawāmiʿ (Ibn Barrī)',
-    },
-  },
-  {
-    id: 'arabe',
-    pole: 'A',
-    mot: 'نحو',
-    court: { fr: 'Arabe', ar: 'العربية', en: 'Arabic' },
-    titre: {
-      fr: 'L’arabe des sciences islamiques',
-      ar: 'العربية لطلبة العلوم الشرعية',
-      en: 'Arabic for Islamic Studies',
-    },
-    niveau: DEBUTANT,
-    description: {
-      fr: 'La grammaire de base pour lire les textes étudiés dans les autres cours.',
-      ar: 'قواعد النحو الأساسية لقراءة المتون المدروسة في باقي المواد.',
-      en: 'Core grammar to read the texts studied in the other courses.',
-    },
-    reference: {
-      fr: 'Al-Ājurrūmiyya (Ibn Ājurrūm)',
-      ar: 'الآجرّومية لابن آجرّوم',
-      en: 'Al-Ājurrūmiyya (Ibn Ājurrūm)',
-    },
-  },
-  {
-    id: 'comparee',
-    pole: 'B',
-    mot: 'أديان',
-    court: { fr: 'Théologie comparée', ar: 'مقارنة الأديان', en: 'Comparative theology' },
-    titre: {
-      fr: 'Théologie comparée des monothéismes',
-      ar: 'مقارنة الأديان التوحيدية',
-      en: 'Comparative Theology of the Monotheisms',
-    },
-    niveau: TOUS_NIVEAUX,
-    description: {
-      fr: 'Dieu, la révélation et la prophétie dans le judaïsme, le christianisme et l’islam.',
-      ar: 'الله والوحي والنبوّة في اليهودية والمسيحية والإسلام.',
-      en: 'God, revelation and prophecy in Judaism, Christianity and Islam.',
-    },
-    reference: {
-      fr: 'Textes choisis des trois traditions',
-      ar: 'نصوص مختارة من التقاليد الثلاثة',
-      en: 'Selected texts from the three traditions',
-    },
-  },
-  {
-    id: 'philo',
-    pole: 'B',
-    mot: 'حكمة',
-    court: { fr: 'Philosophie', ar: 'الفلسفة', en: 'Philosophy' },
-    titre: {
-      fr: 'La philosophie en terre d’islam',
-      ar: 'الفلسفة في الحضارة الإسلامية',
-      en: 'Philosophy in the Islamic World',
-    },
-    niveau: INTERMEDIAIRE,
-    description: {
-      fr: 'D’al-Fârâbî à Averroès : la raison en terre d’islam et son héritage en Europe.',
-      ar: 'من الفارابي إلى ابن رشد: العقل في الحضارة الإسلامية وأثره في أوروبا.',
-      en: 'From al-Fārābī to Averroes: reason in the Islamic world and its legacy in Europe.',
-    },
-    reference: {
-      fr: 'Al-Fārābī, Avicenne, al-Ghazālī, Averroès (extraits)',
-      ar: 'الفارابي، ابن سينا، الغزالي، ابن رشد (نصوص مختارة)',
-      en: 'Al-Fārābī, Avicenna, al-Ghazālī, Averroes (extracts)',
-    },
-  },
-  {
-    id: 'khaldun',
-    pole: 'C',
-    mot: 'مقدمة',
-    court: { fr: 'Ibn Khaldûn', ar: 'ابن خلدون', en: 'Ibn Khaldun' },
-    titre: {
-      fr: 'Ibn Khaldûn et la naissance des sciences sociales',
-      ar: 'ابن خلدون ونشأة العلوم الاجتماعية',
-      en: 'Ibn Khaldun and the Birth of Social Science',
-    },
-    niveau: INTERMEDIAIRE,
-    description: {
-      fr: 'La Muqaddima, premier grand traité sur les sociétés humaines.',
-      ar: 'المقدّمة، أوّل مؤلَّف كبير في دراسة العمران البشري.',
-      en: 'The Muqaddima, the first major treatise on human societies.',
-    },
-    reference: {
-      fr: 'Al-Muqaddima (Ibn Khaldūn)',
-      ar: 'مقدّمة ابن خلدون',
-      en: 'Al-Muqaddima (Ibn Khaldūn)',
-    },
-  },
-  {
-    id: 'histoire',
-    pole: 'C',
-    mot: 'حضارة',
-    court: { fr: 'Histoire et civilisation', ar: 'التاريخ', en: 'History' },
-    titre: {
-      fr: 'Histoire et civilisation de l’islam',
-      ar: 'تاريخ الحضارة الإسلامية',
-      en: 'History and Civilisation of Islam',
-    },
-    niveau: TOUS_NIVEAUX,
-    description: {
-      fr: 'Des premiers califats à al-Andalus et au Maghreb : quatorze siècles d’histoire.',
-      ar: 'من الخلافة الأولى إلى الأندلس والمغرب: أربعة عشر قرنًا من التاريخ.',
-      en: 'From the early caliphates to al-Andalus and the Maghreb: fourteen centuries of history.',
-    },
-    reference: {
-      fr: 'Sources historiques et travaux universitaires',
-      ar: 'مصادر تاريخية ودراسات جامعية',
-      en: 'Historical sources and academic studies',
-    },
-  },
-  {
-    id: 'socio',
-    pole: 'C',
-    mot: 'مجتمع',
-    court: { fr: 'Sociologie des religions', ar: 'علم اجتماع الأديان', en: 'Sociology of religion' },
-    titre: { fr: 'Sociologie des religions', ar: 'علم اجتماع الأديان', en: 'Sociology of Religion' },
-    niveau: TOUS_NIVEAUX,
-    description: {
-      fr: 'Durkheim, Weber et la place du religieux dans les sociétés modernes.',
-      ar: 'دوركايم وفيبر ومكانة الدين في المجتمعات الحديثة.',
-      en: 'Durkheim, Weber and the place of religion in modern societies.',
-    },
-    reference: {
-      fr: 'Durkheim, Weber et la sociologie contemporaine',
-      ar: 'دوركايم، فيبر، علم الاجتماع المعاصر',
-      en: 'Durkheim, Weber and contemporary sociology',
-    },
-  },
-  {
-    id: 'europe',
-    pole: 'C',
-    mot: 'أوروبا',
-    court: { fr: 'Religion et société', ar: 'الدين والمجتمع', en: 'Religion and society' },
-    titre: {
-      fr: 'Religion et société en France et en Europe',
-      ar: 'الدين والمجتمع في فرنسا وأوروبا',
-      en: 'Religion and Society in France and Europe',
-    },
-    niveau: TOUS_NIVEAUX,
-    description: {
-      fr: 'Présence musulmane, laïcité et droit des cultes en France et en Europe.',
-      ar: 'الحضور الإسلامي، والعلمانية، وقانون العبادات في فرنسا وأوروبا.',
-      en: 'Muslim presence, secularism (laïcité) and religious law in France and Europe.',
-    },
-    reference: {
-      fr: 'Loi de 1905, droit des associations, travaux d’historiens',
-      ar: 'قانون 1905، قانون الجمعيات، دراسات المؤرخين',
-      en: 'The 1905 law, French association law, historians’ work',
-    },
+    numero: 3,
+    nom: { fr: 'Troisième année', ar: 'السنة الثالثة', en: 'Third year' },
+    photo: '/photos/ordinateur.webp',
+    matieres: [
+      {
+        arabe: 'التفسير التحليلي',
+        titre: { fr: 'Tafsīr analytique' },
+        detail: { fr: 'Étude approfondie de sourates choisies.' },
+      },
+      { arabe: 'العقيدة وعلم الكلام', titre: { fr: 'Pensée théologique islamique (ʿaqīda et kalām)' } },
+      { arabe: 'تاريخ الحضارة', titre: { fr: 'Histoire de la civilisation musulmane 1 et 2' } },
+      { arabe: 'الزواج والطلاق', titre: { fr: 'Mariage et divorce selon les 4 écoles' } },
+      { arabe: 'الفكر السياسي', titre: { fr: 'Pensée politique islamique classique et contemporaine' } },
+      { arabe: 'الفلسفة الأخلاقية', titre: { fr: 'Philosophie morale et politique' } },
+      {
+        arabe: 'الأخلاق الإسلامية',
+        titre: { fr: 'Éthique islamique contemporaine' },
+        detail: { fr: 'Bioéthique, économie, environnement.' },
+      },
+      { arabe: 'الإسلام في أوروبا', titre: { fr: 'Sociologie de l’islam en Europe' } },
+      { arabe: 'الدولة والأديان', titre: { fr: 'Relations État-religions en France' } },
+    ],
   },
 ];
 
-export const CODES_COURS: ReadonlySet<string> = new Set(COURS.map((c) => c.id));
+/** « Travail de fin d'études », mot pour mot. */
+export const FIN_ETUDES = {
+  titre: 'Travail de fin d’études',
+  points: ['Mémoire de recherche (80-120 pages).', 'Sujet croisant sciences islamiques et sciences sociales.'],
+  exemplesTitre: 'Exemples de sujets :',
+  exemples: [
+    'L’évolution de la pratique religieuse musulmane en France.',
+    'Les maqāṣid al-sharīʿa et les sociétés européennes.',
+    'La gestion des institutions religieuses dans un État laïque.',
+    'Éthique islamique et enjeux environnementaux contemporains.',
+  ],
+};
+
+/** « Compétences acquises », mot pour mot (« l'étudiant » → « l'apprenant »). */
+export const COMPETENCES = {
+  titre: 'Compétences acquises',
+  intro: 'À la fin du programme, l’apprenant saura :',
+  liste: [
+    'analyser les textes islamiques classiques,',
+    'comprendre les dynamiques sociales contemporaines,',
+    'intervenir dans le dialogue religieux et social,',
+    'enseigner ou participer à la recherche académique.',
+  ],
+};

@@ -8,11 +8,7 @@ export default defineConfig({
   site: 'https://academie-shs.fr',
   trailingSlash: 'ignore',
   integrations: [
-    sitemap({
-      i18n: {
-        defaultLocale: 'fr',
-        locales: { fr: 'fr-FR', ar: 'ar', en: 'en' },
-      },
-    }),
+    // Site en français seulement depuis le 11/10/2026 (les pages /ar/ et /en/ sont retirées).
+    sitemap(),
   ],
 });

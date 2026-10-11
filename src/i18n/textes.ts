@@ -1,5 +1,8 @@
-// Tous les textes de l'interface, dans les trois langues. Les cours, eux, sont dans
-// `src/data/cours.ts`. Traductions arabe et anglaise : premier jet, à faire relire.
+// Tous les textes de l'interface. Le programme, lui, est dans `src/data/cours.ts`.
+//
+// Depuis le 11/10/2026, le site n'est publié qu'en FRANÇAIS (cours en français seulement). Les
+// textes arabes et anglais restent ici pour rouvrir ces langues plus tard, mais ne sont plus tenus à
+// jour : les relire et les compléter avant de recréer `src/pages/ar/` et `src/pages/en/`.
 
 import type { Langue } from '../data/cours';
 
@@ -19,42 +22,101 @@ export const ASSOCIATION = {
   courriel: 'contact@academie-shs.fr',
 };
 
-/** Version du texte de consentement, enregistrée dans Brevo avec chaque préinscription. */
-export const VERSION_CONSENTEMENT = '2026-10-01';
+/** Version de la politique de confidentialité, enregistrée dans Brevo avec chaque préinscription. */
+export const VERSION_CONSENTEMENT = '2026-10-11';
 
 export interface Option {
   valeur: string;
   libelle: string;
 }
 
+interface TitreTexte {
+  titre: string;
+  texte: string;
+}
+
 export interface Textes {
   meta: { titre: string; description: string };
-  bandeau: string;
-  marque: { sousTitre: string };
-  nav: { cours: string; etapes: string; faq: string; cta: string; langue: string; principale: string };
+  nav: { enligne: string; cursus: string; faq: string; cta: string; langue: string; principale: string };
+  provisoire: string;
   hero: {
+    pastille: string;
     titreDebut: string;
     titreAccent: string;
-    sousTitre: string;
-    pastilles: string[];
-    ctaPrincipal: string;
+    titreFin: string;
+    chapo: string;
+    preuves: string[];
+    cta: string;
     ctaSecondaire: string;
-    chiffres: { valeur: string; libelle: string }[];
+    photoTexte: string;
+    photoAlt: string;
+    photo2Alt: string;
+    direct: string;
+    directTexte: string;
+    annees: string;
   };
-  atouts: string[];
-  catalogue: {
-    pastille: string;
+  enligne: {
+    surtitre: string;
     titre: string;
     intro: string;
-    filtres: string;
-    tous: string;
-    ajouter: string;
-    ajoute: string;
+    atouts: TitreTexte[];
+    appareils: string;
+    illustration: string;
+    scenes: {
+      classe: { direct: string; titre: string; tableau: string; sondage: string; question: string; oui: string; non: string; main: string };
+      accueil: {
+        bonjour: string;
+        quand: string;
+        cours: string;
+        ouverture: string;
+        rejoindre: string;
+        semaine: string;
+        jours: string[];
+        lignes: string[];
+        aRendre: string;
+        mesCours: string;
+        suivies: string;
+      };
+      replay: { titre: string; rattraper: string; liste: string; autres: string[] };
+      espace: {
+        cours: string;
+        groupe: string;
+        docs: string[];
+        seance: string;
+        rendu: string;
+        vocal: string;
+        prof: string;
+        message: string;
+        question: string;
+      };
+      notifications: [string, string][];
+    };
   };
-  etapes: { pastille: string; titre: string; liste: { titre: string; texte: string }[] };
+  programme: {
+    surtitre: string;
+    titreDebut: string;
+    titreAccent: string;
+    intro: string;
+    annees: string;
+    matieres: (n: number) => string;
+    aVenir: string;
+  };
+  verset: string;
+  objectifs: {
+    surtitre: string;
+    titre: string;
+    liste: string[];
+    certificat: string;
+    certificatDetail: string;
+    photoAlt: string;
+  };
+  etapes: { surtitre: string; titre: string; liste: TitreTexte[] };
   formulaire: {
+    surtitre: string;
     titre: string;
     intro: string;
+    cursusTitre: string;
+    cursusTexte: string;
     prenom: string;
     nom: string;
     courriel: string;
@@ -63,8 +125,6 @@ export interface Textes {
     paysOptions: Option[];
     niveau: string;
     niveauOptions: Option[];
-    mesCours: string;
-    langues: string;
     creneaux: string;
     creneauxOptions: Option[];
     origine: string;
@@ -76,93 +136,161 @@ export interface Textes {
     envoi: string;
     mentions: string;
     confidentialite: string;
-    erreurCours: string;
-    erreurLangues: string;
     erreurEnvoi: string;
     merciTitre: string;
     merciTexte: string;
   };
-  faq: { pastille: string; titre: string; liste: { q: string; r: string }[] };
-  pied: { association: string; contact: string; mentionsLegales: string; confidentialite: string };
-  barre: { finaliser: string };
-}
-
-const LANGUES_COURS: Record<Langue, Option[]> = {
-  fr: [
-    { valeur: 'fr', libelle: 'Français' },
-    { valeur: 'ar', libelle: 'العربية' },
-    { valeur: 'en', libelle: 'English' },
-  ],
-  ar: [
-    { valeur: 'ar', libelle: 'العربية' },
-    { valeur: 'fr', libelle: 'Français' },
-    { valeur: 'en', libelle: 'English' },
-  ],
-  en: [
-    { valeur: 'en', libelle: 'English' },
-    { valeur: 'fr', libelle: 'Français' },
-    { valeur: 'ar', libelle: 'العربية' },
-  ],
-};
-
-export function languesCours(langue: Langue): Option[] {
-  return LANGUES_COURS[langue];
+  faq: { surtitre: string; titre: string; liste: { q: string; r: string }[] };
+  pied: { association: string; statut: string; contact: string; mentionsLegales: string; confidentialite: string };
 }
 
 export const TEXTES: Record<Langue, Textes> = {
   fr: {
     meta: {
-      titre: 'Académie SHS — Sciences islamiques et sciences humaines, en trois langues',
+      titre: 'Académie SHS — Études islamiques et sociales, cursus en trois ans',
       description:
-        'Treize cours en ligne et en direct, pour adultes, en français, en arabe et en anglais : fiqh malikite, sîra, théologie, philosophie, Ibn Khaldûn… Préinscription gratuite et sans engagement.',
+        'Un cursus de trois ans en ligne et en direct, pour adultes : sciences islamiques classiques, sciences humaines et cadre institutionnel français. Préinscription gratuite et sans engagement.',
     },
-    bandeau: 'Préinscriptions 2026-2027 ouvertes · gratuites et sans engagement',
-    marque: { sousTitre: 'Sciences humaines & sociales' },
     nav: {
-      cours: 'Les cours',
-      etapes: 'Comment ça marche',
+      enligne: 'Cours en ligne',
+      cursus: 'Le cursus',
       faq: 'Questions',
       cta: 'Se préinscrire',
       langue: 'Langue',
       principale: 'Navigation principale',
     },
+    provisoire: 'Photo provisoire',
     hero: {
-      titreDebut: 'Les sciences islamiques et les sciences humaines, ',
-      titreAccent: 'en trois langues',
-      sousTitre:
-        'Treize cours en ligne et en direct, pour adultes : fiqh malikite, sîra, théologie, philosophie, Ibn Khaldûn… Préinscrivez-vous, vous recevrez les dates et les tarifs en priorité.',
-      pastilles: ['En ligne et en direct', 'Pour adultes', 'Français · العربية · English', 'Attestation de suivi'],
-      ctaPrincipal: 'Je me préinscris — c’est gratuit',
-      ctaSecondaire: 'Découvrir les 13 cours',
-      chiffres: [
-        { valeur: '3', libelle: 'pôles d’études' },
-        { valeur: '13', libelle: 'cours au choix' },
-        { valeur: '3', libelle: 'langues d’enseignement' },
-        { valeur: '0 €', libelle: 'pour se préinscrire' },
-      ],
+      pastille: 'Préinscriptions 2026-2027 ouvertes',
+      titreDebut: 'Étudier les sciences islamiques, ',
+      titreAccent: 'comprendre',
+      titreFin: ' la France d’aujourd’hui.',
+      chapo:
+        'Un cursus de trois ans qui combine sciences religieuses, sciences humaines et connaissances du cadre institutionnel français. En ligne et en direct, pour adultes.',
+      preuves: ['3 ans', 'En direct', 'Rediffusions', 'Pour adultes'],
+      cta: 'Je me préinscris, c’est gratuit',
+      ctaSecondaire: 'Voir le programme',
+      photoTexte: 'Maîtriser la tradition, comprendre son temps.',
+      photoAlt: 'Calligraphie arabe peinte sur un mur de pierre',
+      photo2Alt: 'Une main prend des notes à côté d’une tasse',
+      direct: 'En direct',
+      directTexte: 'L’enseignant face à vous, chaque semaine',
+      annees: 'années de cursus',
     },
-    atouts: ['Association loi 1901', 'En direct avec l’enseignant', 'Textes de référence', 'Sans engagement'],
-    catalogue: {
-      pastille: 'Le catalogue',
-      titre: 'Choisissez vos cours',
-      intro: 'Ajoutez autant de cours que vous voulez : ils seront déjà cochés dans le formulaire de préinscription.',
-      filtres: 'Filtrer par pôle',
-      tous: 'Tous les cours',
-      ajouter: 'Ajouter à ma préinscription',
-      ajoute: 'Ajouté à ma préinscription',
+    enligne: {
+      surtitre: 'Cours en ligne',
+      titre: 'Une vraie classe, où que vous soyez.',
+      intro:
+        'Un enseignant, un groupe, un rendez-vous chaque semaine. Et tout ce qu’il faut autour pour ne rien manquer.',
+      atouts: [
+        {
+          titre: 'La classe en direct',
+          texte: 'Vous voyez l’enseignant, vous levez la main, vous réagissez et répondez à ses sondages, à l’oral comme par écrit.',
+        },
+        {
+          titre: 'Votre semaine d’un coup d’œil',
+          texte: 'Le prochain cours et un bouton pour le rejoindre, les séances et devoirs à venir, vos séances suivies.',
+        },
+        {
+          titre: 'Les rediffusions',
+          texte: 'Un cours manqué est signalé « à rattraper ». Revoyez-le à votre rythme, en accéléré si vous voulez, avec ses supports.',
+        },
+        {
+          titre: 'Supports, devoirs et vie de la classe',
+          texte: 'Les documents de chaque séance, des devoirs à rendre en photo, en fichier ou en message vocal, et un mur pour échanger avec le groupe.',
+        },
+      ],
+      appareils: 'Sur ordinateur, tablette ou téléphone.',
+      illustration: 'Illustration de l’espace de cours en ligne',
+      scenes: {
+        classe: {
+          direct: 'En direct',
+          titre: 'Uṣūl al-fiqh · séance 4',
+          tableau: 'Les sources du droit',
+          sondage: 'Sondage',
+          question: 'Avez-vous compris la notion d’ijmāʿ ?',
+          oui: 'Oui',
+          non: 'Pas encore',
+          main: 'Main levée',
+        },
+        accueil: {
+          bonjour: 'Bonjour Sarah',
+          quand: 'Prochain cours · ce soir, 20 h 30',
+          cours: 'Introduction aux sciences du hadith',
+          ouverture: 'La salle ouvre 15 min avant',
+          rejoindre: 'Rejoindre la classe',
+          semaine: 'Ma semaine',
+          jours: ['Lun', 'Mer', 'Jeu', 'Sam'],
+          lignes: ['Sciences du Coran', 'Sciences du hadith', 'Fiche de lecture', 'Fiqh des ʿibādāt'],
+          aRendre: 'à rendre',
+          mesCours: 'Mes cours',
+          suivies: '8 séances suivies · 1 manquée',
+        },
+        replay: {
+          titre: 'Sîra · séance 2',
+          rattraper: 'À rattraper',
+          liste: 'Séances du cours',
+          autres: ['Sîra · séance 1', 'Coran · séance 3', 'Coran · séance 2'],
+        },
+        espace: {
+          cours: 'Sciences du hadith',
+          groupe: '1re année · 18 apprenants',
+          docs: ['Al-Bayqūniyya, texte annoté', 'Les degrés du hadith', 'Récitation du poème'],
+          seance: 'Séance',
+          rendu: 'Devoir rendu : récitation des vers 1 à 10',
+          vocal: 'Message vocal · envoyé mardi',
+          prof: 'L’enseignant',
+          message: 'Pour mercredi : relisez les vers 1 à 10, on les commente ensemble.',
+          question: 'Poser une question',
+        },
+        notifications: [
+          ['La classe est ouverte', 'Sciences du hadith'],
+          ['Devoir corrigé', 'Récitation des vers 1 à 10'],
+          ['Nouveau message sur le mur', 'Sciences du hadith'],
+        ],
+      },
+    },
+    programme: {
+      surtitre: 'Le cursus',
+      titreDebut: 'Études islamiques et sociales ',
+      titreAccent: '(3 ans)',
+      // Le paragraphe d'introduction du document de l'association, mot pour mot, sauf
+      // « étudiants » → « apprenants » (l'association n'est pas déclarée au rectorat).
+      intro:
+        'L’objectif est de former des apprenants capables de maîtriser les sciences islamiques classiques, tout en comprenant les réalités sociales contemporaines et le contexte français et européen. Le programme combine donc sciences religieuses, sciences humaines et connaissances du cadre institutionnel français.',
+      annees: 'Années du cursus',
+      matieres: (n) => (n <= 1 ? `${n} matière` : `${n} matières`),
+      aVenir: 'à venir',
+    },
+    verset: '« Et dis : Seigneur, accrois mon savoir. » (Coran 20:114)',
+    objectifs: {
+      surtitre: 'Objectifs généraux',
+      titre: 'Ce que le cursus vous apporte',
+      liste: [
+        'Acquérir une formation solide en sciences islamiques traditionnelles.',
+        'Comprendre les enjeux contemporains des sociétés européennes, notamment la société française.',
+        'Développer une capacité d’analyse critique, historique et sociologique.',
+        'Former des enseignants, cadres religieux et associatifs, chercheurs ou médiateurs culturels.',
+      ],
+      certificat: 'Certificat de l’Académie',
+      certificatDetail: 'à l’issue du cursus',
+      photoAlt: 'Des mains suivent les lignes d’un livre ouvert',
     },
     etapes: {
-      pastille: 'Comment ça marche',
-      titre: 'Trois étapes, deux minutes',
+      surtitre: 'Comment ça marche',
+      titre: 'Trois étapes jusqu’à la rentrée',
       liste: [
-        { titre: 'Choisissez vos cours', texte: 'Ajoutez-les depuis le catalogue, autant que vous voulez.' },
-        { titre: 'Indiquez votre langue', texte: 'Français, arabe ou anglais : une classe ouvre là où la demande existe.' },
-        { titre: 'Recevez dates et tarifs', texte: 'Les préinscrits sont prévenus avant l’ouverture des inscriptions.' },
+        { titre: 'Vous vous préinscrivez', texte: 'Deux minutes, gratuit et sans engagement.' },
+        { titre: 'Vous êtes informé en priorité', texte: 'Dates, tarifs et modalités vous parviennent avant l’ouverture des inscriptions.' },
+        { titre: 'Vous entrez en 1re année', texte: 'Cours en ligne et en direct, en français.' },
       ],
     },
     formulaire: {
-      titre: 'Ma préinscription',
+      surtitre: 'Préinscription',
+      titre: 'Entrez en première année.',
       intro: 'Deux minutes, aucun paiement. Les champs marqués d’un astérisque sont obligatoires.',
+      cursusTitre: 'Études islamiques et sociales',
+      cursusTexte: 'Cursus de trois ans · entrée en 1re année',
       prenom: 'Prénom',
       nom: 'Nom',
       courriel: 'E-mail',
@@ -179,15 +307,13 @@ export const TEXTES: Record<Langue, Textes> = {
         { valeur: 'TN', libelle: 'Tunisie' },
         { valeur: 'AUTRE', libelle: 'Autre pays' },
       ],
-      niveau: 'Votre niveau',
+      niveau: 'Votre niveau en sciences islamiques',
       niveauOptions: [
         { valeur: 'debutant', libelle: 'Débutant' },
         { valeur: 'intermediaire', libelle: 'Intermédiaire' },
         { valeur: 'avance', libelle: 'Avancé' },
         { valeur: 'ne-sait-pas', libelle: 'Je ne sais pas' },
       ],
-      mesCours: 'Mes cours',
-      langues: 'Langue(s) du cours',
       creneaux: 'Créneaux possibles',
       creneauxOptions: [
         { valeur: 'soir-semaine', libelle: 'Soirs de semaine' },
@@ -213,99 +339,183 @@ export const TEXTES: Record<Langue, Textes> = {
       mentions:
         'Vos données servent uniquement à organiser la rentrée. Responsable du traitement : l’association Académie française des sciences humaines et sociales.',
       confidentialite: 'Politique de confidentialité',
-      erreurCours: 'Choisissez au moins un cours.',
-      erreurLangues: 'Choisissez au moins une langue.',
       erreurEnvoi:
         'L’envoi n’a pas abouti. Vérifiez les champs et réessayez, ou écrivez-nous à contact@academie-shs.fr.',
       merciTitre: 'Merci, c’est noté !',
       merciTexte: 'Votre préinscription est enregistrée. Vous recevrez les dates et les tarifs en priorité.',
     },
     faq: {
-      pastille: 'Questions',
+      surtitre: 'Questions',
       titre: 'Vos questions',
       liste: [
         {
-          q: 'Combien coûtent les cours ?',
+          q: 'Combien coûte le cursus ?',
           r: 'Les tarifs ne sont pas encore fixés. Ils seront communiqués en priorité aux préinscrits, avant l’ouverture des inscriptions.',
         },
         { q: 'Quand commencent les cours ?', r: 'La date de rentrée sera annoncée aux préinscrits dès qu’elle sera arrêtée.' },
         {
           q: 'La préinscription m’engage-t-elle ?',
-          r: 'Non. Elle est gratuite et sans engagement : elle nous aide à savoir quels cours ouvrir, dans quelle langue et à quels horaires.',
+          r: 'Non. Elle est gratuite et sans engagement : elle nous aide à savoir à quels horaires ouvrir les classes.',
         },
+        { q: 'Faut-il parler arabe ?', r: 'Non. Les cours sont donnés en français.' },
         {
-          q: 'Faut-il parler arabe ?',
-          r: 'Non. Chaque cours peut être donné en français, en arabe ou en anglais selon la demande. Le cours d’arabe est ouvert aux débutants.',
+          q: 'Et si je manque un cours ?',
+          r: 'Chaque cours en direct est enregistré : vous le retrouvez en rediffusion, avec ses supports.',
         },
-        {
-          q: 'Comment se déroulent les cours ?',
-          r: 'En ligne et en direct, avec l’enseignant, à partir des textes de référence indiqués sur chaque cours.',
-        },
-        { q: 'Que reçoit-on à la fin d’un cours ?', r: 'Une attestation de suivi délivrée par l’Académie.' },
+        { q: 'Que reçoit-on à la fin du cursus ?', r: 'Un certificat délivré par l’Académie.' },
       ],
     },
     pied: {
       association: 'L’association',
+      statut: 'Association loi 1901',
       contact: 'Contact',
       mentionsLegales: 'Mentions légales',
       confidentialite: 'Politique de confidentialité',
     },
-    barre: { finaliser: 'Finaliser' },
   },
 
   ar: {
     meta: {
-      titre: 'الأكاديمية الفرنسية للعلوم الإنسانية والاجتماعية — العلوم الإسلامية والعلوم الإنسانية بثلاث لغات',
+      titre: 'الأكاديمية الفرنسية للعلوم الإنسانية والاجتماعية — الدراسات الإسلامية والاجتماعية في ثلاث سنوات',
       description:
-        'ثلاث عشرة مادة مباشرة عبر الإنترنت للكبار، بالعربية والفرنسية والإنجليزية: الفقه المالكي، السيرة، العقيدة، الفلسفة، ابن خلدون… التسجيل المسبق مجاني ودون أيّ التزام.',
+        'برنامج دراسي من ثلاث سنوات، مباشر عبر الإنترنت وللكبار: العلوم الإسلامية الأصيلة، والعلوم الإنسانية، والإطار المؤسسي الفرنسي. بالعربية والفرنسية والإنجليزية. التسجيل المسبق مجاني ودون أيّ التزام.',
     },
-    bandeau: 'التسجيل المسبق للموسم 2026-2027 مفتوح · مجاني ودون أيّ التزام',
-    marque: { sousTitre: 'للعلوم الإنسانية والاجتماعية' },
     nav: {
-      cours: 'المواد',
-      etapes: 'كيف يتمّ التسجيل',
+      enligne: 'الدراسة عن بُعد',
+      cursus: 'البرنامج',
       faq: 'أسئلة شائعة',
       cta: 'سجّل مسبقًا',
       langue: 'اللغة',
       principale: 'القائمة الرئيسية',
     },
+    provisoire: 'صورة مؤقتة',
     hero: {
-      titreDebut: 'العلوم الإسلامية والعلوم الإنسانية، ',
-      titreAccent: 'بثلاث لغات',
-      sousTitre:
-        'ثلاث عشرة مادة مباشرة عبر الإنترنت للكبار: الفقه المالكي، السيرة، العقيدة، الفلسفة، ابن خلدون… سجّل مسبقًا وتصلك المواعيد والرسوم قبل غيرك.',
-      pastilles: ['مباشرة عبر الإنترنت', 'للكبار', 'العربية · Français · English', 'شهادة متابعة'],
-      ctaPrincipal: 'سجّل مسبقًا مجانًا',
-      ctaSecondaire: 'اكتشف المواد الثلاث عشرة',
-      chiffres: [
-        { valeur: '3', libelle: 'أقطاب دراسية' },
-        { valeur: '13', libelle: 'مادة للاختيار' },
-        { valeur: '3', libelle: 'لغات للتدريس' },
-        { valeur: '0 €', libelle: 'للتسجيل المسبق' },
-      ],
+      pastille: 'التسجيل المسبق للموسم 2026-2027 مفتوح',
+      titreDebut: 'ادرس العلوم الإسلامية، ',
+      titreAccent: 'وافهم',
+      titreFin: ' فرنسا اليوم.',
+      chapo:
+        'برنامج من ثلاث سنوات يجمع العلوم الإسلامية الأصيلة، والعلوم الإنسانية، ومعرفة الإطار المؤسسي الفرنسي. مباشر عبر الإنترنت، للكبار.',
+      preuves: ['3 سنوات', 'دروس مباشرة', 'إعادة المشاهدة', 'العربية · Français · English'],
+      cta: 'سجّل مسبقًا مجانًا',
+      ctaSecondaire: 'اطّلع على البرنامج',
+      photoTexte: 'إتقان التراث، وفهم العصر.',
+      photoAlt: 'خطّ عربي مرسوم على جدار من الحجر',
+      photo2Alt: 'يد تدوّن ملاحظات بجانب فنجان',
+      direct: 'مباشر',
+      directTexte: 'الأستاذ أمامك، كلّ أسبوع',
+      annees: 'سنوات دراسية',
     },
-    atouts: ['جمعية خاضعة لقانون 1901', 'مباشرة مع الأستاذ', 'متون معتمدة', 'دون أيّ التزام'],
-    catalogue: {
-      pastille: 'المواد الدراسية',
-      titre: 'اختر موادك',
-      intro: 'أضف ما شئت من المواد، وستجدها محدَّدة مسبقًا في استمارة التسجيل.',
-      filtres: 'تصفية حسب القطب',
-      tous: 'كل المواد',
-      ajouter: 'أضف إلى تسجيلي',
-      ajoute: 'أُضيفت إلى تسجيلي',
+    enligne: {
+      surtitre: 'الدراسة عن بُعد',
+      titre: 'فصل حقيقي، أينما كنت.',
+      intro: 'أستاذ، ومجموعة، وموعد كلّ أسبوع. ومعه كلّ ما تحتاجه حتى لا يفوتك شيء.',
+      atouts: [
+        {
+          titre: 'الفصل المباشر',
+          texte: 'ترى الأستاذ، وترفع يدك، وتتفاعل وتجيب عن استطلاعاته، شفهيًا أو كتابةً.',
+        },
+        {
+          titre: 'أسبوعك في لمحة',
+          texte: 'الدرس القادم وزرّ للانضمام إليه، والحصص والواجبات القادمة، وحصصك التي حضرتها.',
+        },
+        {
+          titre: 'إعادة المشاهدة',
+          texte: 'يُشار إلى الدرس الذي فاتك بعبارة «للاستدراك». شاهده بالسرعة التي تناسبك، مع مرفقاته.',
+        },
+        {
+          titre: 'المرفقات والواجبات وحياة الفصل',
+          texte: 'وثائق كلّ حصة، وواجبات تُسلَّم صورةً أو ملفًا أو رسالة صوتية، وجدار للتواصل مع المجموعة.',
+        },
+      ],
+      appareils: 'على الحاسوب أو اللوحة أو الهاتف.',
+      illustration: 'رسم توضيحي لفضاء الدراسة عن بُعد',
+      scenes: {
+        classe: {
+          direct: 'مباشر',
+          titre: 'أصول الفقه · الحصة 4',
+          tableau: 'مصادر التشريع',
+          sondage: 'استطلاع',
+          question: 'هل فهمت معنى الإجماع؟',
+          oui: 'نعم',
+          non: 'ليس بعد',
+          main: 'يد مرفوعة',
+        },
+        accueil: {
+          bonjour: 'مرحبًا سارة',
+          quand: 'الدرس القادم · هذا المساء، 20:30',
+          cours: 'مدخل إلى علوم الحديث',
+          ouverture: 'يُفتح الفصل قبل 15 دقيقة',
+          rejoindre: 'انضمّ إلى الفصل',
+          semaine: 'أسبوعي',
+          jours: ['الإثنين', 'الأربعاء', 'الخميس', 'السبت'],
+          lignes: ['علوم القرآن', 'علوم الحديث', 'بطاقة قراءة', 'فقه العبادات'],
+          aRendre: 'للتسليم',
+          mesCours: 'موادي',
+          suivies: '8 حصص حضرتها · 1 فائتة',
+        },
+        replay: {
+          titre: 'السيرة · الحصة 2',
+          rattraper: 'للاستدراك',
+          liste: 'حصص المادة',
+          autres: ['السيرة · الحصة 1', 'القرآن · الحصة 3', 'القرآن · الحصة 2'],
+        },
+        espace: {
+          cours: 'علوم الحديث',
+          groupe: 'السنة الأولى · 18 طالبًا',
+          docs: ['المنظومة البيقونية، نصّ مشروح', 'مراتب الحديث', 'إنشاد المنظومة'],
+          seance: 'الحصة',
+          rendu: 'واجب مُسلَّم: إنشاد الأبيات 1 إلى 10',
+          vocal: 'رسالة صوتية · أُرسلت يوم الثلاثاء',
+          prof: 'الأستاذ',
+          message: 'ليوم الأربعاء: راجعوا الأبيات 1 إلى 10، وسنشرحها معًا.',
+          question: 'اطرح سؤالًا',
+        },
+        notifications: [
+          ['الفصل مفتوح الآن', 'علوم الحديث'],
+          ['تمّ تصحيح الواجب', 'إنشاد الأبيات 1 إلى 10'],
+          ['رسالة جديدة على الجدار', 'علوم الحديث'],
+        ],
+      },
+    },
+    programme: {
+      surtitre: 'البرنامج',
+      titreDebut: 'ثلاث سنوات، ',
+      titreAccent: 'مادةً بعد مادة.',
+      intro: 'كلّ سنة تُبنى على التي قبلها. اختر سنة لترى موادها.',
+      annees: 'سنوات البرنامج',
+      matieres: (n) => (n === 1 ? 'مادة واحدة' : n === 2 ? 'مادتان' : n <= 10 ? `${n} مواد` : `${n} مادة`),
+      aVenir: 'قريبًا',
+    },
+    verset: '﴿وَقُل رَّبِّ زِدْنِي عِلْمًا﴾ (طه: 114)',
+    objectifs: {
+      surtitre: 'ما يقدّمه لك البرنامج',
+      titre: 'ما يقدّمه لك البرنامج',
+      liste: [
+        'اكتساب تكوين متين في العلوم الإسلامية الأصيلة.',
+        'فهم القضايا المعاصرة للمجتمعات الأوروبية، ولا سيما المجتمع الفرنسي.',
+        'تنمية القدرة على التحليل النقدي والتاريخي والاجتماعي.',
+        'تكوين مدرّسين وأطر دينية وجمعوية وباحثين ووسطاء ثقافيين.',
+      ],
+      certificat: 'شهادة الأكاديمية',
+      certificatDetail: 'في نهاية البرنامج',
+      photoAlt: 'يدان تتتبّعان أسطر كتاب مفتوح',
     },
     etapes: {
-      pastille: 'كيف يتمّ التسجيل',
-      titre: 'ثلاث خطوات في دقيقتين',
+      surtitre: 'كيف يتمّ التسجيل',
+      titre: 'ثلاث خطوات حتى الدخول الدراسي',
       liste: [
-        { titre: 'اختر موادك', texte: 'أضفها من قائمة المواد، بقدر ما تشاء.' },
-        { titre: 'حدّد لغتك', texte: 'بالعربية أو الفرنسية أو الإنجليزية: نفتح الفصل حيث يوجد الطلب.' },
-        { titre: 'تصلك المواعيد والرسوم', texte: 'يُبلَّغ المسجَّلون مسبقًا قبل فتح التسجيل.' },
+        { titre: 'تسجّل مسبقًا', texte: 'دقيقتان، مجانًا ودون أيّ التزام.' },
+        { titre: 'تصلك المعلومات قبل غيرك', texte: 'المواعيد والرسوم والتفاصيل تصلك قبل فتح التسجيل.' },
+        { titre: 'تلتحق بالسنة الأولى', texte: 'دروس مباشرة عبر الإنترنت، باللغة التي تختارها.' },
       ],
     },
     formulaire: {
-      titre: 'تسجيلي المسبق',
+      surtitre: 'التسجيل المسبق',
+      titre: 'التحق بالسنة الأولى.',
       intro: 'دقيقتان، دون أيّ دفع. الحقول المشار إليها بنجمة إلزامية.',
+      cursusTitre: 'الدراسات الإسلامية والاجتماعية',
+      cursusTexte: 'برنامج من ثلاث سنوات · الالتحاق بالسنة الأولى',
       prenom: 'الاسم',
       nom: 'اسم العائلة',
       courriel: 'البريد الإلكتروني',
@@ -322,15 +532,13 @@ export const TEXTES: Record<Langue, Textes> = {
         { valeur: 'TN', libelle: 'تونس' },
         { valeur: 'AUTRE', libelle: 'بلد آخر' },
       ],
-      niveau: 'مستواك',
+      niveau: 'مستواك في العلوم الإسلامية',
       niveauOptions: [
         { valeur: 'debutant', libelle: 'مبتدئ' },
         { valeur: 'intermediaire', libelle: 'متوسط' },
         { valeur: 'avance', libelle: 'متقدّم' },
         { valeur: 'ne-sait-pas', libelle: 'لا أعرف' },
       ],
-      mesCours: 'موادي',
-      langues: 'لغة الدراسة',
       creneaux: 'الأوقات المناسبة',
       creneauxOptions: [
         { valeur: 'soir-semaine', libelle: 'مساء أيام الأسبوع' },
@@ -356,92 +564,176 @@ export const TEXTES: Record<Langue, Textes> = {
       mentions:
         'تُستعمل معطياتك فقط لتنظيم الدخول الدراسي. المسؤول عن المعالجة: جمعية الأكاديمية الفرنسية للعلوم الإنسانية والاجتماعية.',
       confidentialite: 'سياسة الخصوصية',
-      erreurCours: 'اختر مادة واحدة على الأقل.',
-      erreurLangues: 'اختر لغة واحدة على الأقل.',
       erreurEnvoi: 'تعذّر إرسال التسجيل. تحقّق من الحقول وأعد المحاولة، أو راسلنا على contact@academie-shs.fr.',
       merciTitre: 'شكرًا، تمّ تسجيلك!',
       merciTexte: 'سجّلنا تسجيلك المسبق، وستصلك المواعيد والرسوم قبل غيرك.',
     },
     faq: {
-      pastille: 'أسئلة شائعة',
+      surtitre: 'أسئلة شائعة',
       titre: 'أسئلتكم',
       liste: [
-        { q: 'كم تكلّف الدروس؟', r: 'لم تُحدَّد الرسوم بعد، وستُبلَّغ أوّلًا للمسجَّلين مسبقًا قبل فتح التسجيل.' },
+        { q: 'كم يكلّف البرنامج؟', r: 'لم تُحدَّد الرسوم بعد، وستُبلَّغ أوّلًا للمسجَّلين مسبقًا قبل فتح التسجيل.' },
         { q: 'متى تبدأ الدروس؟', r: 'سيُعلَن موعد بدء الدراسة للمسجَّلين مسبقًا فور تحديده.' },
         {
           q: 'هل يُلزمني التسجيل المسبق بشيء؟',
-          r: 'لا. هو مجاني ودون أيّ التزام، ويساعدنا على معرفة المواد التي نفتحها، وبأيّ لغة، وفي أيّ أوقات.',
+          r: 'لا. هو مجاني ودون أيّ التزام، ويساعدنا على معرفة اللغة والأوقات التي نفتح بها الفصول.',
         },
-        {
-          q: 'هل يجب أن أتقن العربية؟',
-          r: 'لا. يمكن تدريس كلّ مادة بالعربية أو الفرنسية أو الإنجليزية حسب الطلب، ودرس العربية مفتوح للمبتدئين.',
-        },
-        { q: 'كيف تُقدَّم الدروس؟', r: 'عبر الإنترنت وبشكل مباشر مع الأستاذ، انطلاقًا من المتون المعتمدة المذكورة في كلّ مادة.' },
-        { q: 'ماذا أحصل عليه في نهاية المادة؟', r: 'شهادة متابعة تمنحها الأكاديمية.' },
+        { q: 'هل يجب أن أتقن العربية؟', r: 'لا. يمكن متابعة البرنامج بالعربية أو الفرنسية أو الإنجليزية حسب الطلب.' },
+        { q: 'وإن فاتني درس؟', r: 'كلّ درس مباشر مسجَّل، فتجده في إعادة المشاهدة مع مرفقاته.' },
+        { q: 'ماذا أحصل عليه في نهاية البرنامج؟', r: 'شهادة تمنحها الأكاديمية.' },
       ],
     },
     pied: {
       association: 'الجمعية',
+      statut: 'جمعية خاضعة لقانون 1901',
       contact: 'للتواصل',
       mentionsLegales: 'البيانات القانونية',
       confidentialite: 'سياسة الخصوصية',
     },
-    barre: { finaliser: 'إتمام التسجيل' },
   },
 
   en: {
     meta: {
-      titre: 'Académie SHS — Islamic sciences and the humanities, in three languages',
+      titre: 'Académie SHS — Islamic and Social Studies, a three-year programme',
       description:
-        'Thirteen live online courses for adults, in French, Arabic and English: Maliki law, the Sīra, theology, philosophy, Ibn Khaldun… Free, non-binding pre-registration.',
+        'A three-year programme, live and online, for adults: classical Islamic sciences, the humanities and the French institutional context. In English, French and Arabic. Free, non-binding pre-registration.',
     },
-    bandeau: 'Pre-registration for 2026–27 is open · free and non-binding',
-    marque: { sousTitre: 'Humanities & Social Sciences' },
     nav: {
-      cours: 'Courses',
-      etapes: 'How it works',
+      enligne: 'Online classes',
+      cursus: 'Programme',
       faq: 'FAQ',
       cta: 'Pre-register',
       langue: 'Language',
       principale: 'Main navigation',
     },
+    provisoire: 'Placeholder photo',
     hero: {
-      titreDebut: 'Islamic sciences and the humanities, ',
-      titreAccent: 'in three languages',
-      sousTitre:
-        'Thirteen live online courses for adults: Maliki law, the Sīra, theology, philosophy, Ibn Khaldun… Pre-register and be the first to receive start dates and fees.',
-      pastilles: ['Live and online', 'For adults', 'English · Français · العربية', 'Certificate of attendance'],
-      ctaPrincipal: 'Pre-register for free',
-      ctaSecondaire: 'Browse the 13 courses',
-      chiffres: [
-        { valeur: '3', libelle: 'areas of study' },
-        { valeur: '13', libelle: 'courses to choose from' },
-        { valeur: '3', libelle: 'teaching languages' },
-        { valeur: '€0', libelle: 'to pre-register' },
-      ],
+      pastille: 'Pre-registration for 2026–27 is open',
+      titreDebut: 'Study the Islamic sciences, ',
+      titreAccent: 'understand',
+      titreFin: ' France and Europe today.',
+      chapo:
+        'A three-year programme bringing together the classical Islamic sciences, the humanities and an understanding of French institutions. Live and online, for adults.',
+      preuves: ['3 years', 'Live classes', 'Replays', 'English · Français · العربية'],
+      cta: 'Pre-register for free',
+      ctaSecondaire: 'See the programme',
+      photoTexte: 'Master the tradition, understand your time.',
+      photoAlt: 'Arabic calligraphy painted on a stone wall',
+      photo2Alt: 'A hand taking notes next to a cup',
+      direct: 'Live',
+      directTexte: 'Your teacher in front of you, every week',
+      annees: 'years of study',
     },
-    atouts: ['Non-profit association', 'Live with the teacher', 'Reference texts', 'Non-binding'],
-    catalogue: {
-      pastille: 'Course catalogue',
-      titre: 'Choose your courses',
-      intro: 'Add as many courses as you like: they will already be ticked in the pre-registration form.',
-      filtres: 'Filter by area',
-      tous: 'All courses',
-      ajouter: 'Add to my pre-registration',
-      ajoute: 'Added to my pre-registration',
+    enligne: {
+      surtitre: 'Online classes',
+      titre: 'A real class, wherever you are.',
+      intro: 'One teacher, one group, one appointment every week. And everything around it so you never miss a thing.',
+      atouts: [
+        {
+          titre: 'Live classes',
+          texte: 'You see the teacher, raise your hand, react and answer polls, speaking or in writing.',
+        },
+        {
+          titre: 'Your week at a glance',
+          texte: 'Your next class with a button to join it, upcoming sessions and homework, and the sessions you have attended.',
+        },
+        {
+          titre: 'Replays',
+          texte: 'A missed class is flagged “to catch up”. Watch it at your own pace, faster if you like, with its materials.',
+        },
+        {
+          titre: 'Materials, homework and class life',
+          texte: 'The documents for each session, homework handed in as a photo, a file or a voice message, and a wall to talk with the group.',
+        },
+      ],
+      appareils: 'On a computer, tablet or phone.',
+      illustration: 'Illustration of the online learning space',
+      scenes: {
+        classe: {
+          direct: 'Live',
+          titre: 'Uṣūl al-fiqh · session 4',
+          tableau: 'The sources of law',
+          sondage: 'Poll',
+          question: 'Have you understood ijmāʿ?',
+          oui: 'Yes',
+          non: 'Not yet',
+          main: 'Hand raised',
+        },
+        accueil: {
+          bonjour: 'Hello Sarah',
+          quand: 'Next class · tonight, 8:30 pm',
+          cours: 'Introduction to the Hadith Sciences',
+          ouverture: 'The room opens 15 min before',
+          rejoindre: 'Join the class',
+          semaine: 'My week',
+          jours: ['Mon', 'Wed', 'Thu', 'Sat'],
+          lignes: ['Qur’anic sciences', 'Hadith sciences', 'Reading notes', 'Fiqh of ʿibādāt'],
+          aRendre: 'due',
+          mesCours: 'My courses',
+          suivies: '8 sessions attended · 1 missed',
+        },
+        replay: {
+          titre: 'Sīra · session 2',
+          rattraper: 'To catch up',
+          liste: 'Course sessions',
+          autres: ['Sīra · session 1', 'Qur’an · session 3', 'Qur’an · session 2'],
+        },
+        espace: {
+          cours: 'Hadith sciences',
+          groupe: 'First year · 18 learners',
+          docs: ['Al-Bayqūniyya, annotated text', 'The grades of hadith', 'Recitation of the poem'],
+          seance: 'Session',
+          rendu: 'Homework handed in: lines 1 to 10',
+          vocal: 'Voice message · sent Tuesday',
+          prof: 'The teacher',
+          message: 'For Wednesday: reread lines 1 to 10, we will go through them together.',
+          question: 'Ask a question',
+        },
+        notifications: [
+          ['The class is open', 'Hadith sciences'],
+          ['Homework marked', 'Lines 1 to 10'],
+          ['New post on the wall', 'Hadith sciences'],
+        ],
+      },
+    },
+    programme: {
+      surtitre: 'Programme',
+      titreDebut: 'Three years, ',
+      titreAccent: 'one subject at a time.',
+      intro: 'Each year builds on the one before. Choose a year to see its subjects.',
+      annees: 'Programme years',
+      matieres: (n) => (n === 1 ? '1 subject' : `${n} subjects`),
+      aVenir: 'coming soon',
+    },
+    verset: '“And say: My Lord, increase me in knowledge.” (Qur’an 20:114)',
+    objectifs: {
+      surtitre: 'What the programme gives you',
+      titre: 'What the programme gives you',
+      liste: [
+        'Acquire a solid grounding in the traditional Islamic sciences.',
+        'Understand the contemporary issues facing European societies, especially French society.',
+        'Develop a capacity for critical, historical and sociological analysis.',
+        'Train teachers, religious and community leaders, researchers or cultural mediators.',
+      ],
+      certificat: 'Academy certificate',
+      certificatDetail: 'at the end of the programme',
+      photoAlt: 'Hands following the lines of an open book',
     },
     etapes: {
-      pastille: 'How it works',
-      titre: 'Three steps, two minutes',
+      surtitre: 'How it works',
+      titre: 'Three steps to the start of term',
       liste: [
-        { titre: 'Choose your courses', texte: 'Add them from the catalogue, as many as you like.' },
-        { titre: 'Tell us your language', texte: 'French, Arabic or English: a class opens wherever there is demand.' },
-        { titre: 'Get dates and fees first', texte: 'Pre-registered students hear before registration opens.' },
+        { titre: 'You pre-register', texte: 'Two minutes, free and non-binding.' },
+        { titre: 'You hear first', texte: 'Dates, fees and practical details reach you before registration opens.' },
+        { titre: 'You start the first year', texte: 'Live online classes, in the language of your choice.' },
       ],
     },
     formulaire: {
-      titre: 'My pre-registration',
+      surtitre: 'Pre-registration',
+      titre: 'Join the first year.',
       intro: 'Two minutes, no payment. Fields marked with an asterisk are required.',
+      cursusTitre: 'Islamic and Social Studies',
+      cursusTexte: 'Three-year programme · first-year entry',
       prenom: 'First name',
       nom: 'Last name',
       courriel: 'Email',
@@ -458,15 +750,13 @@ export const TEXTES: Record<Langue, Textes> = {
         { valeur: 'TN', libelle: 'Tunisia' },
         { valeur: 'AUTRE', libelle: 'Other country' },
       ],
-      niveau: 'Your level',
+      niveau: 'Your level in Islamic studies',
       niveauOptions: [
         { valeur: 'debutant', libelle: 'Beginner' },
         { valeur: 'intermediaire', libelle: 'Intermediate' },
         { valeur: 'avance', libelle: 'Advanced' },
         { valeur: 'ne-sait-pas', libelle: 'Not sure' },
       ],
-      mesCours: 'My courses',
-      langues: 'Course language(s)',
       creneaux: 'Possible times',
       creneauxOptions: [
         { valeur: 'soir-semaine', libelle: 'Weekday evenings' },
@@ -492,34 +782,34 @@ export const TEXTES: Record<Langue, Textes> = {
       mentions:
         'Your data is used only to organise the new academic year. Data controller: the association Académie française des sciences humaines et sociales.',
       confidentialite: 'Privacy policy',
-      erreurCours: 'Choose at least one course.',
-      erreurLangues: 'Choose at least one language.',
       erreurEnvoi: 'Sending failed. Check the fields and try again, or email us at contact@academie-shs.fr.',
       merciTitre: 'Thank you, you’re registered!',
       merciTexte: 'Your pre-registration has been recorded. You will be the first to receive dates and fees.',
     },
     faq: {
-      pastille: 'FAQ',
+      surtitre: 'FAQ',
       titre: 'Your questions',
       liste: [
         {
-          q: 'How much do the courses cost?',
+          q: 'How much does the programme cost?',
           r: 'Fees have not been set yet. Pre-registered students will hear about them first, before registration opens.',
         },
         { q: 'When do classes start?', r: 'The start date will be announced to pre-registered students as soon as it is set.' },
         {
           q: 'Am I committed by pre-registering?',
-          r: 'No. It is free and non-binding: it helps us know which courses to open, in which language and at what times.',
+          r: 'No. It is free and non-binding: it helps us decide in which language and at what times to open classes.',
         },
-        {
-          q: 'Do I need to speak Arabic?',
-          r: 'No. Each course can be taught in French, Arabic or English depending on demand. The Arabic course is open to beginners.',
-        },
-        { q: 'How are classes run?', r: 'Online and live, with the teacher, based on the reference texts listed for each course.' },
-        { q: 'What do I receive at the end of a course?', r: 'A certificate of attendance issued by the Academy.' },
+        { q: 'Do I need to speak Arabic?', r: 'No. The programme can be followed in English, French or Arabic, depending on demand.' },
+        { q: 'What if I miss a class?', r: 'Every live class is recorded: you can watch the replay, with its materials.' },
+        { q: 'What do I receive at the end?', r: 'A certificate issued by the Academy.' },
       ],
     },
-    pied: { association: 'The association', contact: 'Contact', mentionsLegales: 'Legal notice', confidentialite: 'Privacy policy' },
-    barre: { finaliser: 'Complete' },
+    pied: {
+      association: 'The association',
+      statut: 'Non-profit association (French law of 1901)',
+      contact: 'Contact',
+      mentionsLegales: 'Legal notice',
+      confidentialite: 'Privacy policy',
+    },
   },
 };

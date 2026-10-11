@@ -3,8 +3,11 @@
 // 1. Toute adresse autre que le domaine principal (www, academie-shs.com) est redirigée en 301
 //    vers https://academie-shs.fr, chemin et paramètres conservés : une seule adresse pour le
 //    référencement, et aucune règle de redirection à entretenir dans le tableau de bord.
-// 2. `/api/preinscription` est traité par `preinscription.ts`.
-// 3. Tout le reste est servi depuis les fichiers construits par Astro (`dist/`).
+// 2. Les anciennes pages arabe et anglaise (`/ar/`, `/en/`) renvoient vers l'accueil : le site
+//    n'est publié qu'en français depuis le 11/10/2026. Redirection temporaire (302), pour pouvoir
+//    rouvrir ces langues sans que les navigateurs aient gardé la redirection en mémoire.
+// 3. `/api/preinscription` est traité par `preinscription.ts`.
+// 4. Tout le reste est servi depuis les fichiers construits par Astro (`dist/`).
 
 import { onRequest, onRequestPost } from './preinscription';
 
@@ -30,6 +33,10 @@ export default {
 
     if (!estServiDirectement(url.hostname)) {
       return Response.redirect(`https://${DOMAINE}${url.pathname}${url.search}`, 301);
+    }
+
+    if (/^\/(ar|en)(\/|$)/.test(url.pathname)) {
+      return Response.redirect(`${url.origin}/`, 302);
     }
 
     if (url.pathname === '/api/preinscription') {

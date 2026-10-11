@@ -38,8 +38,8 @@ nom (majuscules, tirets bas) et le type.
 | `TELEPHONE_WHATSAPP` | Texte | `+33612345678` |
 | `PAYS` | Texte | `FR`, `BE`, `CH`, `CA`, `GB`, `MA`, `DZ`, `TN`, `AUTRE` |
 | `NIVEAU` | Texte | `debutant`, `intermediaire`, `avance`, `ne-sait-pas` |
-| `MODULES` | Texte | codes des cours, séparés par une virgule : `fiqh, sira, khaldun` |
-| `LANGUE_COURS` | Texte | `fr`, `ar`, `en`, séparés par une virgule |
+| `MODULES` | Texte | `cursus-eis` (cursus complet, depuis le 11/10/2026) ; les préinscriptions plus anciennes gardent leurs codes de cours : `fiqh, sira, khaldun` |
+| `LANGUE_COURS` | Texte | `fr`, `ar`, `en`, séparés par une virgule (plus rempli depuis le 11/10/2026 : cours en français seulement) |
 | `CRENEAUX` | Texte | `soir-semaine`, `samedi`, `dimanche` |
 | `ORIGINE` | Texte | `whatsapp`, `instagram`, `facebook`, `bouche-a-oreille`, `mosquee-association`, `autre` |
 | `LANGUE_SITE` | Texte | langue de la page utilisée : `fr`, `ar`, `en` |
@@ -61,17 +61,21 @@ numéro est donc gardé en texte.
 
 ### Pourquoi du texte, et pas un attribut « choix multiple » pour `MODULES` ?
 
-Les cours vont changer. Avec un attribut texte, ajouter un cours dans `src/data/cours.ts` suffit ;
-avec un choix multiple, il faudrait aussi ajouter l'option dans Brevo, sinon l'envoi échoue.
+L'offre change : on est passé de treize cours au choix à un cursus unique le 11/10/2026. Avec un
+attribut texte, il suffit de changer le code dans `src/data/cours.ts` ; avec un choix multiple, il
+faudrait aussi ajouter l'option dans Brevo, sinon l'envoi échoue.
 
-## 3. Un segment par cours
+## 3. Les segments
 
-Contacts → Segments → Créer : `MODULES` **contient** `fiqh`. Un segment par cours (et par langue
-avec `LANGUE_COURS` **contient** `ar`, etc.) donne en direct le nombre de demandes. C'est ce
-chiffre qui décide quelles classes ouvrir.
+Contacts → Segments → Créer : `MODULES` **contient** `cursus-eis` donne les préinscrits au cursus.
+Un segment par créneau (`CRENEAUX` **contient** `samedi`) donne en direct le nombre de demandes :
+c'est ce chiffre qui décide à quels horaires ouvrir les classes.
 
-Les codes de cours sont l'`id` de chaque cours dans `src/data/cours.ts` : `fiqh`, `sira`, `aqida`,
-`coran`, `hadith`, `tajwid`, `arabe`, `comparee`, `philo`, `khaldun`, `histoire`, `socio`, `europe`.
+Les cours sont en français seulement depuis le 11/10/2026 : `LANGUE_COURS` n'est plus rempli, et
+ne garde que les choix des préinscriptions plus anciennes.
+
+Avant le 11/10/2026, `MODULES` recevait des codes de cours (`fiqh`, `sira`, `aqida`, `coran`,
+`hadith`, `tajwid`, `arabe`, `comparee`, `philo`, `khaldun`, `histoire`, `socio`, `europe`).
 
 ## 4. La clé d'API
 
@@ -92,7 +96,7 @@ Cloudflare et dans le `.env` local, ignoré par git.
 
 ## Ce que fait le formulaire quand une personne se réinscrit
 
-Le contact est retrouvé par son adresse électronique. Ses cours, langues et créneaux sont
+Le contact est retrouvé par son adresse électronique. Son cursus et ses créneaux sont
 **ajoutés** aux précédents, jamais remplacés : sans courriel de confirmation, quelqu'un peut
 saisir l'adresse d'un autre, et il ne doit pas pouvoir effacer ses choix.
 
