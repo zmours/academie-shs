@@ -13,14 +13,15 @@ année par année. Le visiteur se préinscrit **au cursus complet** (plus de cou
 
 | Chemin | Rôle |
 |---|---|
-| `src/data/cours.ts` | **le programme**, mot pour mot celui de l'association, et le code du cursus enregistré dans Brevo |
-| `src/i18n/textes.ts` | tous les autres textes du site (français publié ; arabe et anglais gardés pour plus tard) |
+| `src/data/cours.ts` | **le programme**, mot pour mot celui de l'association, les heures de 1re année, la rentrée (`RENTREE` : date, heures par semaine, prix) et le code du cursus enregistré dans Brevo |
+| `src/i18n/textes.ts` | tous les autres textes du site, en français ; la vidéo de présentation (`VIDEO_PRESENTATION`) |
+| `src/i18n/textes-archive.ts` | les textes arabes et anglais de l'ancienne page, gardés pour rouvrir ces langues |
 | `src/components/Accueil.astro` | la page d'accueil |
-| `src/components/Experience.astro` | la section « Cours en ligne » et ses écrans dessinés en HTML et CSS |
+| `src/components/Experience.astro` | la section « Cours en ligne » et sa classe en direct dessinée en HTML et CSS |
 | `src/layouts/Base.astro` | en-tête, pied de page, balises de partage et de référencement |
 | `src/scripts/preinscription.ts` | envoi du formulaire |
-| `src/scripts/interactions.ts` | en-tête, onglets (années, cours en ligne), apparition des sections |
-| `src/styles/global.css` | la charte (couleurs, cartes, boutons, version mobile et arabe) |
+| `src/scripts/interactions.ts` | en-tête, apparitions, compteurs, classe animée, barre d'inscription sur téléphone, vidéo |
+| `src/styles/global.css` | la charte « encre & laiton » (couleurs, typographie, mouvement, version mobile) |
 | `src/pages/` | les pages : accueil, mentions légales, confidentialité, 404 |
 | `worker/` | Worker Cloudflare : `index.ts` aiguille `/api/*`, `preinscription.ts` relaie le formulaire vers Brevo |
 | `public/` | favicon, image de partage, `robots.txt`, en-têtes HTTP |
@@ -28,8 +29,20 @@ année par année. Le visiteur se préinscrit **au cursus complet** (plus de cou
 | `docs/BREVO.md` | préparer le compte Brevo (liste, attributs, segments) |
 
 Technique : [Astro](https://astro.build) en site statique, hébergé sur un **Worker Cloudflare**. Les
-polices (Schibsted Grotesk, Readex Pro, Noto Naskh Arabic) sont servies par le site lui-même, pas par Google : aucune donnée de
-visiteur ne part chez un tiers avant l'envoi du formulaire.
+polices (Fraunces, Schibsted Grotesk, Amiri, et Readex Pro pour une future version arabe) sont
+servies par le site lui-même, pas par Google : aucune donnée de visiteur ne part chez un tiers
+avant l'envoi du formulaire.
+
+## Changer la rentrée, le prix ou publier la vidéo
+
+- Date de rentrée, heures par semaine, prix : `RENTREE` dans `src/data/cours.ts`. Tous les textes
+  de la page (repères, carte du prix, questions, barre sur téléphone) en découlent. **L'image de
+  partage les écrit en dur** : mettre `outils/og-image.html` d'accord, `npm run images`, puis
+  changer le `v=` de l'image dans `src/layouts/Base.astro` (WhatsApp garde l'ancienne sinon).
+- La vidéo de présentation : `VIDEO_PRESENTATION` dans `src/i18n/textes.ts` (identifiant YouTube
+  et durée). Tant qu'il est vide, l'ouverture montre une photo. La vidéo est servie par
+  youtube-nocookie.com et ne se charge qu'au clic ; compléter alors la politique de
+  confidentialité.
 
 ## Travailler en local
 

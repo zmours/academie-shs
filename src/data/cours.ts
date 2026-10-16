@@ -8,6 +8,10 @@
 //
 // On se préinscrit au cursus complet : la fonction qui relaie le formulaire enregistre
 // `CODE_CURSUS` dans l'attribut Brevo `MODULES`.
+//
+// Depuis le 16/10/2026, la première année suit aussi le tableau horaire de l'association : six
+// matières de 15 heures. La Sīra y est enseignée « avec contexte » : la ligne « Contexte historique
+// et enseignements spirituels et sociaux » de `cursus.md` devient le contenu de la Sīra.
 
 export type Langue = 'fr' | 'ar' | 'en';
 export type Traduit = Record<Langue, string>;
@@ -26,13 +30,15 @@ export interface Matiere {
   titre: TexteFr;
   /** Contenu de la matière, quand le programme le précise. */
   detail?: TexteFr;
+  /** Volume horaire de la matière, quand l'association l'a fixé (première année seulement). */
+  heures?: number;
 }
 
 export interface Annee {
   numero: 1 | 2 | 3;
   nom: Traduit;
-  /** Photo d'illustration, dans `public/photos/`. */
-  photo: string;
+  /** L'année ouvre à la prochaine rentrée : elle est mise en avant sur la page. */
+  ouverte?: boolean;
   matieres: Matiere[];
 }
 
@@ -40,7 +46,7 @@ export const ANNEES: Annee[] = [
   {
     numero: 1,
     nom: { fr: 'Première année', ar: 'السنة الأولى', en: 'First year' },
-    photo: '/photos/boukhara.webp',
+    ouverte: true,
     matieres: [
       {
         arabe: 'علوم القرآن',
@@ -54,6 +60,7 @@ export const ANNEES: Annee[] = [
           ar: 'الوحي، والجمع، والقراءات، والناسخ والمنسوخ.',
           en: 'Revelation, compilation, readings (qirāʾāt), abrogation.',
         },
+        heures: 15,
       },
       {
         arabe: 'علوم الحديث',
@@ -67,10 +74,17 @@ export const ANNEES: Annee[] = [
           ar: 'المصطلح، والتصنيف، والرواية.',
           en: 'Terminology, classification, transmission.',
         },
+        heures: 15,
       },
       {
         arabe: 'السيرة النبوية',
         titre: { fr: 'Sīra du Prophète (biographie prophétique)', ar: 'السيرة النبوية', en: 'The Life of the Prophet (Sīra)' },
+        detail: {
+          fr: 'Contexte historique et enseignements spirituels et sociaux.',
+          ar: 'السياق التاريخي والتوجيهات الروحية والاجتماعية.',
+          en: 'Historical context, spiritual and social teachings.',
+        },
+        heures: 15,
       },
       {
         arabe: 'أصول الفقه',
@@ -79,14 +93,7 @@ export const ANNEES: Annee[] = [
           ar: 'أصول الفقه، الجزء الأول',
           en: 'Principles of Islamic Law (uṣūl al-fiqh), Part 1',
         },
-      },
-      {
-        arabe: 'السياق التاريخي',
-        titre: {
-          fr: 'Contexte historique et enseignements spirituels et sociaux',
-          ar: 'السياق التاريخي والتوجيهات الروحية والاجتماعية',
-          en: 'Historical Context, Spiritual and Social Teachings',
-        },
+        heures: 15,
       },
       {
         arabe: 'فقه العبادات',
@@ -100,6 +107,7 @@ export const ANNEES: Annee[] = [
           ar: 'الطهارة، والصلاة، والصيام، والزكاة، والحج، مع حفظ جزء من متن ابن عاشر.',
           en: 'Purification, prayer, fasting, zakat, pilgrimage. (Partial memorisation of Ibn ʿĀshir)',
         },
+        heures: 15,
       },
       {
         arabe: 'علم الاجتماع',
@@ -109,13 +117,13 @@ export const ANNEES: Annee[] = [
           ar: 'المفاهيم الأساسية: التنشئة الاجتماعية، والمؤسسات، والمعايير.',
           en: 'Core concepts: socialisation, institutions, norms.',
         },
+        heures: 15,
       },
     ],
   },
   {
     numero: 2,
     nom: { fr: 'Deuxième année', ar: 'السنة الثانية', en: 'Second year' },
-    photo: '/photos/mosquee.webp',
     matieres: [
       {
         arabe: 'أصول الفقه',
@@ -143,7 +151,6 @@ export const ANNEES: Annee[] = [
   {
     numero: 3,
     nom: { fr: 'Troisième année', ar: 'السنة الثالثة', en: 'Third year' },
-    photo: '/photos/ordinateur.webp',
     matieres: [
       {
         arabe: 'التفسير التحليلي',
@@ -190,3 +197,20 @@ export const COMPETENCES = {
     'enseigner ou participer à la recherche académique.',
   ],
 };
+
+/**
+ * La rentrée, telle que l'association l'a fixée le 16/10/2026. Les jours et horaires des cours ne
+ * sont pas encore arrêtés : ne pas les afficher, la page dit seulement « 3 h par semaine ».
+ */
+export const RENTREE = {
+  /** Premier jour des cours. */
+  debut: '2026-11-01',
+  heuresParSemaine: 3,
+  /** Prix de la première année, en euros. */
+  prixPremiereAnnee: 400,
+};
+
+/** Volume horaire total d'une année : la somme des heures de ses matières. */
+export function heuresAnnee(annee: Annee): number {
+  return annee.matieres.reduce((total, m) => total + (m.heures ?? 0), 0);
+}

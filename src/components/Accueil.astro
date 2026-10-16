@@ -1,7 +1,12 @@
 ---
-// La page d'accueil. Publiée en français seulement ; les textes viennent de `src/i18n/textes.ts`.
+// La page d'accueil. Publiée en français seulement ; les textes viennent de `src/i18n/textes.ts`,
+// le programme et la rentrée de `src/data/cours.ts`.
+//
+// ⚠️ Le formulaire est lu par `src/scripts/preinscription.ts` et vérifié par
+// `worker/preinscription.ts` avant d'aller dans Brevo : garder les `name` des champs et les
+// valeurs des listes tels quels.
 import { ANNEES, COMPETENCES, FIN_ETUDES, type Langue } from '../data/cours';
-import { TEXTES } from '../i18n/textes';
+import { ASSOCIATION, TEXTES, VIDEO_PRESENTATION } from '../i18n/textes';
 import Experience from './Experience.astro';
 
 interface Props {
@@ -9,275 +14,330 @@ interface Props {
 }
 
 const { langue } = Astro.props;
-const t = TEXTES[langue];
+const t = TEXTES;
 const f = t.formulaire;
+const r = t.reperes;
 const cleTurnstile = import.meta.env.PUBLIC_TURNSTILE_SITE_KEY;
-const fleche = langue === 'ar' ? 'M19 12H5M11 6l-6 6 6 6' : 'M5 12h14M13 6l6 6-6 6';
+const video = VIDEO_PRESENTATION.youtube !== '';
+const premiere = ANNEES.find((a) => a.ouverte) ?? ANNEES[0];
+const suivantes = ANNEES.filter((a) => a !== premiere);
 ---
 
-<section class="cadre hero">
-  <div class="hero__texte">
-    <span class="pastille"><i></i>{t.hero.pastille}</span>
-    <h1>{t.hero.titreDebut}<em>{t.hero.titreAccent}</em>{t.hero.titreFin}</h1>
-    <p class="hero__chapo">{t.hero.chapo}</p>
-    <ul class="hero__preuves">
-      {t.hero.preuves.map((p) => <li>{p}</li>)}
-    </ul>
-    <div class="hero__actions">
-      <a class="btn btn--safran btn--grand" href="#preinscription">
-        {t.hero.cta}
-        <span class="btn__fleche" aria-hidden="true"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><path d={fleche}></path></svg></span>
-      </a>
-      <a class="lien" href="#programme">{t.hero.ctaSecondaire}</a>
+<!-- Ouverture : la promesse à gauche, la vidéo (ou la photo) à droite -->
+<section class="ouverture bande">
+  <div class="cadre">
+    <div>
+      <span class="pastille"><i></i><span set:html={t.hero.pastille} /></span>
+      <h1>{t.hero.titreDebut}<em>{t.hero.titreAccent}</em>{t.hero.titreFin}</h1>
+      <p class="chapo">{t.hero.chapo}</p>
+      <div class="actions" data-actions>
+        <a class="btn btn--metal" href="#preinscription">{t.hero.cta}<svg width="16" height="16" aria-hidden="true"><use href="#fleche"></use></svg></a>
+        {
+          video ? (
+            <button class="lien-video" type="button" data-lancer-video>
+              <span class="rond"><svg width="14" height="14" aria-hidden="true"><use href="#lecture"></use></svg></span>
+              {t.hero.ctaVideo}
+            </button>
+          ) : (
+            <a class="lien-video" href="#cursus">
+              <span class="rond"><svg width="14" height="14" aria-hidden="true"><use href="#fleche"></use></svg></span>
+              {t.hero.ctaProgramme}
+            </a>
+          )
+        }
+      </div>
     </div>
-  </div>
 
-  <div class="mosaique">
-    <figure class="tuile tuile--photo">
-      <img src="/photos/calligraphie.webp" alt={t.hero.photoAlt} width="1024" height="768" fetchpriority="high" />
-      <figcaption>{t.hero.photoTexte}</figcaption>
-      <span class="provisoire">{t.provisoire}</span>
+    <figure class="video" data-video={video ? VIDEO_PRESENTATION.youtube : undefined}>
+      {
+        video ? (
+          <button class="video__cadre" type="button" data-lancer-video aria-label={t.hero.videoLire}>
+            <img src="/photos/boukhara.webp" alt="" width="1100" height="733" fetchpriority="high" />
+            <span class="video__lecture" aria-hidden="true"><svg width="30" height="30"><use href="#lecture"></use></svg></span>
+            <span class="video__legende">
+              <span><b>{t.hero.videoTitre}</b><span>{t.hero.videoTexte}</span></span>
+              <span class="video__duree">{VIDEO_PRESENTATION.duree}</span>
+            </span>
+          </button>
+        ) : (
+          <div class="video__cadre video__cadre--photo">
+            <img src="/photos/boukhara.webp" alt={t.hero.photoAlt} width="1100" height="733" fetchpriority="high" />
+            <span class="video__legende">
+              <span><b set:html={t.hero.legendeTitre} /><span>{t.hero.legendeTexte}</span></span>
+            </span>
+            <span class="provisoire">{t.provisoire}</span>
+          </div>
+        )
+      }
+      <svg class="sceau" viewBox="0 0 200 200" aria-hidden="true"><use href="#sceau"></use></svg>
+      {
+        video ? (
+          <figcaption class="video__sous"><b>{t.hero.videoTitre}</b><span>{VIDEO_PRESENTATION.duree}</span></figcaption>
+        ) : (
+          <figcaption class="video__sous"><b set:html={t.hero.legendeTitre} /><span>{t.hero.legendeTexte}</span></figcaption>
+        )
+      }
     </figure>
-    <div class="tuile tuile--safran">
-      <span class="direct"><i></i>{t.hero.direct}</span>
-      <p>{t.hero.directTexte}</p>
-    </div>
-    <div class="tuile tuile--sauge">
-      <span class="compteur">3</span>
-      <p>{t.hero.annees}</p>
-    </div>
   </div>
 </section>
 
-<Experience langue={langue} />
+<section class="reperes bande" aria-label={r.libelle}>
+  <div class="cadre" data-revele>
+    <div class="repere"><b set:html={r.debut} /><span>{r.debutTexte}</span></div>
+    <div class="repere"><b><span data-compte={r.heuresParSemaine}>{r.heuresParSemaine}</span> h</b><span>{r.semaine}</span></div>
+    <div class="repere"><b><span data-compte={r.heures}>{r.heures}</span> h</b><span set:html={r.heuresTexte} /></div>
+    <div class="repere"><b><span data-compte={r.prix}>{r.prix}</span> €</b><span>{r.prixTexte}</span></div>
+    <div class="repere"><b>{r.direct}</b><span>{r.directTexte}</span></div>
+  </div>
+</section>
 
-<section class="programme apparait" id="programme">
+<!-- Le cursus : la première année en avant, les suivantes repliées -->
+<section class="cursus profond bande" id="cursus">
+  <span class="filigrane ar" aria-hidden="true">علم</span>
   <div class="cadre">
-    <div class="programme__tete">
-      <div>
+    <div class="cursus__tete">
+      <div data-revele>
         <p class="surtitre">{t.programme.surtitre}</p>
         <h2>{t.programme.titreDebut}<em>{t.programme.titreAccent}</em></h2>
+        <p class="intro">{t.programme.intro}</p>
       </div>
-      <p class="programme__intro">{t.programme.intro}</p>
+      <div class="objectifs" data-revele>
+        <h3>{t.programme.objectifsTitre}</h3>
+        <ul>
+          {t.programme.objectifs.map((o) => <li><svg width="20" height="20" aria-hidden="true"><use href="#coche"></use></svg><span>{o}</span></li>)}
+        </ul>
+      </div>
     </div>
 
-    <div class="onglets-annees" role="tablist" aria-label={t.programme.annees} data-onglets="annees">
+    <ol class="parcours" aria-label={t.programme.parcours}>
+      {t.programme.etapesParcours.map((e) => <li><b set:html={e.titre} /><span>{e.texte}</span></li>)}
+    </ol>
+
+    <article class="premiere" data-revele>
+      <div class="premiere__info">
+        <span class="premiere__num" aria-hidden="true">{premiere.numero}</span>
+        <h3>{premiere.nom[langue]}</h3>
+        <span class="etiquette"><span set:html={t.programme.rentree} /></span>
+        <div class="chiffres">
+          {
+            t.programme.chiffres.map((c) => (
+              <div><b><span data-compte={c.valeur}>{c.valeur}</span>{c.suffixe}</b><span>{c.libelle}</span></div>
+            ))
+          }
+        </div>
+        <a class="btn btn--metal" href="#preinscription">{t.programme.cta}<svg width="16" height="16" aria-hidden="true"><use href="#fleche"></use></svg></a>
+      </div>
+      <div class="premiere__programme">
+        <h4><span>{t.programme.repartition}</span><span>{t.programme.parMatiere}</span></h4>
+        <div class="repartition" aria-hidden="true">{premiere.matieres.map(() => <i></i>)}</div>
+        <ol class="heures">
+          {
+            premiere.matieres.map((m) => (
+              <li>
+                <span class="puce-couleur"></span>
+                <b>{m.titre[langue] ?? m.titre.fr}</b>
+                {m.heures && <em>{m.heures} h</em>}
+                {m.detail && <span>{m.detail[langue] ?? m.detail.fr}</span>}
+              </li>
+            ))
+          }
+        </ol>
+      </div>
+    </article>
+
+    <div class="suite">
       {
-        ANNEES.map((a, i) => (
-          <button
-            type="button"
-            role="tab"
-            id={`onglet-annee-${a.numero}`}
-            aria-controls={`annee-${a.numero}`}
-            aria-selected={i === 0 ? 'true' : 'false'}
-            tabindex={i === 0 ? 0 : -1}
-          >
-            <span class="onglet__num">{a.numero}</span>
-            <span class="onglet__texte">
-              <b>{a.nom[langue]}</b>
-              <small>{a.matieres.length > 0 ? t.programme.matieres(a.matieres.length) : t.programme.aVenir}</small>
-            </span>
-          </button>
+        suivantes.map((a) => (
+          <details class="annee-carte" data-revele>
+            <summary>
+              <span class="num">{a.numero}</span>
+              <span><h3>{a.nom[langue]}</h3><small>{t.programme.matieres(a.matieres.length)} · {t.programme.horairesAVenir}</small></span>
+              <span class="ouvrir">{t.programme.voirProgramme}<svg width="16" height="16" aria-hidden="true"><use href="#plus"></use></svg></span>
+            </summary>
+            <ol class="matieres">
+              {a.matieres.map((m) => (
+                <li>
+                  <b>{m.titre[langue] ?? m.titre.fr}</b>
+                  {m.detail && <span>{m.detail[langue] ?? m.detail.fr}</span>}
+                </li>
+              ))}
+            </ol>
+          </details>
         ))
       }
     </div>
 
-    {
-      ANNEES.map((a, i) => (
-        <div class="annee" id={`annee-${a.numero}`} role="tabpanel" aria-labelledby={`onglet-annee-${a.numero}`} hidden={i !== 0}>
-          <figure class="annee__couverture">
-            <img src={a.photo} alt="" loading="lazy" width="1024" height="683" />
-            <figcaption>
-              <span class="annee__num">{a.numero}</span>
-              <b>{a.nom[langue]}</b>
-              <span>{a.matieres.length > 0 ? t.programme.matieres(a.matieres.length) : t.programme.aVenir}</span>
-            </figcaption>
-          </figure>
-          <ol class="matieres">
-            {a.matieres.map((m, k) => (
-              <li class="matiere">
-                <div class="matiere__haut">
-                  <span>{String(k + 1).padStart(2, '0')}</span>
-                  {langue !== 'ar' && <span class="ar" lang="ar">{m.arabe}</span>}
-                </div>
-                <h3>{m.titre[langue] ?? m.titre.fr}</h3>
-                {m.detail && <p>{m.detail[langue] ?? m.detail.fr}</p>}
-              </li>
-            ))}
-          </ol>
-        </div>
-      ))
-    }
-
     <div class="aboutissement">
-      <div class="aboutissement__bloc">
+      <div class="bloc bloc--ligne" data-revele>
         <h3>{FIN_ETUDES.titre}</h3>
-        <ul>
-          {FIN_ETUDES.points.map((p) => <li>{p}</li>)}
-        </ul>
-        <p class="aboutissement__sous-titre">{FIN_ETUDES.exemplesTitre}</p>
-        <ul class="aboutissement__exemples">
-          {FIN_ETUDES.exemples.map((e) => <li>{e}</li>)}
-        </ul>
+        <ul>{FIN_ETUDES.points.map((p) => <li>{p}</li>)}</ul>
+        <p class="sous">{FIN_ETUDES.exemplesTitre.replace(/\s*:$/, '')}</p>
+        <ul>{FIN_ETUDES.exemples.map((e) => <li>{e}</li>)}</ul>
       </div>
-      <div class="aboutissement__bloc aboutissement__bloc--clair">
+      <div class="bloc bloc--clair" data-revele>
+        <svg class="sceau" viewBox="0 0 200 200" aria-hidden="true"><use href="#sceau"></use></svg>
         <h3>{COMPETENCES.titre}</h3>
         <p>{COMPETENCES.intro}</p>
-        <ul>
-          {COMPETENCES.liste.map((c) => <li>{c}</li>)}
-        </ul>
+        <ul>{COMPETENCES.liste.map((c) => <li>{c}</li>)}</ul>
+        <p><b>{t.programme.certificat}</b> {t.programme.certificatDetail}</p>
       </div>
     </div>
   </div>
 </section>
 
-<section class="bande-photo">
-  <img src="/photos/mosquee.webp" alt="" loading="lazy" width="1024" height="768" />
-  <div>
-    <span class="ar" lang="ar">وَقُل رَّبِّ زِدْنِي عِلْمًا</span>
-    {langue !== 'ar' && <span>{t.verset}</span>}
-  </div>
-</section>
-
-<section class="cadre objectifs apparait">
-  <div>
-    <p class="surtitre">{t.objectifs.surtitre}</p>
-    <h2>{t.objectifs.titre}</h2>
-    <ul class="objectifs__liste">
-      {t.objectifs.liste.map((o) => <li>{o}</li>)}
-    </ul>
-  </div>
-  <figure class="objectifs__photo">
-    <img src="/photos/lecture.webp" alt={t.objectifs.photoAlt} loading="lazy" width="1024" height="683" />
-    <figcaption class="objectifs__badge">{t.objectifs.certificat}<small>{t.objectifs.certificatDetail}</small></figcaption>
-    <span class="provisoire">{t.provisoire}</span>
-  </figure>
-</section>
-
-<section class="cadre etapes apparait" id="etapes">
-  <p class="surtitre">{t.etapes.surtitre}</p>
-  <h2>{t.etapes.titre}</h2>
-  <ol class="etapes__liste">
-    {
-      t.etapes.liste.map((e, i) => (
-        <li class="etape">
-          <span class="etape__rond" aria-hidden="true">{i + 1}</span>
-          <h3>{e.titre}</h3>
-          <p>{e.texte}</p>
-        </li>
-      ))
-    }
-  </ol>
-</section>
-
-<section class="cadre inscription" id="preinscription">
-  <div class="inscription__boite">
-    <div class="inscription__entete" data-bloc-formulaire>
-      <p class="surtitre">{f.surtitre}</p>
-      <h2>{f.titre}</h2>
-      <p>{f.intro}</p>
-      <div class="cursus-choisi">
-        <span class="cursus-choisi__icone" aria-hidden="true">
-          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6L9 17l-5-5"></path></svg>
-        </span>
-        <span><b>{f.cursusTitre}</b><small>{f.cursusTexte}</small></span>
-      </div>
-    </div>
-
-    <form
-      class="formulaire"
-      data-formulaire
-      data-langue={langue}
-      data-libelle-envoi={f.envoi}
-      novalidate
-    >
-      <div class="piege" aria-hidden="true">
-        <label>Site web <input type="text" name="site_web" tabindex="-1" autocomplete="off" /></label>
-      </div>
-
-      <div class="grille-2">
-        <label class="champ">{f.prenom} *<input type="text" name="prenom" id="prenom" autocomplete="given-name" required maxlength="80" /></label>
-        <label class="champ">{f.nom} *<input type="text" name="nom" id="nom" autocomplete="family-name" required maxlength="80" /></label>
-        <label class="champ">{f.courriel} *<input type="email" name="courriel" id="courriel" autocomplete="email" required maxlength="160" dir="ltr" /></label>
-        <label class="champ">{f.whatsapp} *<input type="tel" name="whatsapp" id="whatsapp" autocomplete="tel" required maxlength="25" placeholder="+33 6 12 34 56 78" dir="ltr" /></label>
-        <label class="champ">{f.pays}
-          <select name="pays" id="pays" autocomplete="country">
-            {f.paysOptions.map((o) => <option value={o.valeur}>{o.libelle}</option>)}
-          </select>
-        </label>
-        <label class="champ">{f.niveau}
-          <select name="niveau" id="niveau">
-            {f.niveauOptions.map((o) => <option value={o.valeur}>{o.libelle}</option>)}
-          </select>
-        </label>
-      </div>
-
-      <fieldset class="groupe">
-        <legend>{f.creneaux}</legend>
-        <div class="puces">
-          {
-            f.creneauxOptions.map((o) => (
-              <label class="puce">
-                <input type="checkbox" name="creneaux" value={o.valeur} />
-                {o.libelle}
-              </label>
-            ))
-          }
-        </div>
-      </fieldset>
-
-      <label class="champ">{f.origine}
-        <select name="origine" id="origine">
-          {f.origineOptions.map((o) => <option value={o.valeur}>{o.libelle}</option>)}
-        </select>
-      </label>
-
-      <div class="accords">
-        <label class="accord"><input type="checkbox" name="majeur" id="majeur" required /><span>{f.majeur} *</span></label>
-        <label class="accord"><input type="checkbox" name="consentement" id="consentement" required /><span>{f.consentement} *</span></label>
-        <label class="accord accord--facultatif"><input type="checkbox" name="newsletter" id="newsletter" /><span>{f.newsletter}</span></label>
-      </div>
-
-      {cleTurnstile && <div class="cf-turnstile" data-sitekey={cleTurnstile} data-language={langue} />}
-
-      <p class="message-erreur" data-message-erreur role="alert" hidden>{f.erreurEnvoi}</p>
-
-      <button type="submit" class="btn btn--safran btn--grand formulaire__envoyer" data-envoyer>{f.envoyer}</button>
-
-      <p class="formulaire__mentions">
-        {f.mentions} <a href="/confidentialite/">{f.confidentialite}</a>
+<!-- La rentrée : le rythme et le prix -->
+<section class="rentree bande" id="rentree">
+  <div class="cadre">
+    <div data-revele>
+      <p class="surtitre">{t.rentree.surtitre}</p>
+      <h2 set:html={t.rentree.titre} />
+      <dl class="faits">
+        {
+          t.rentree.faits.map((x) => (
+            <div><dt><span data-compte={x.valeur}>{x.valeur}</span>{x.suffixe && <small>{x.suffixe}</small>}</dt><dd>{x.texte}</dd></div>
+          ))
+        }
+      </dl>
+      <p class="note">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3" y="4.5" width="18" height="16" rx="2"></rect><path d="M3 9.5h18M8 2.5v4M16 2.5v4"></path></svg>
+        <span>{t.rentree.note}</span>
       </p>
-    </form>
-
-    <div class="merci" data-merci hidden tabindex="-1">
-      <span class="merci__icone" aria-hidden="true">
-        <svg width="34" height="34" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6L9 17l-5-5"></path></svg>
-      </span>
-      <h2>{f.merciTitre}</h2>
-      <p>{f.merciTexte}</p>
+    </div>
+    <div class="prix profond" data-revele>
+      <span class="ar" aria-hidden="true">علم</span>
+      <p class="surtitre">{t.rentree.prixSurtitre}</p>
+      <p class="prix__montant"><span data-compte={t.rentree.prix}>{t.rentree.prix}</span>&nbsp;€<small>{t.rentree.prixUnite}</small></p>
+      <p class="prix__detail">{t.rentree.prixDetail}</p>
+      <a class="btn btn--metal" href="#preinscription">{t.rentree.cta}<svg width="16" height="16" aria-hidden="true"><use href="#fleche"></use></svg></a>
+      <p class="petit">{t.rentree.gratuit}</p>
     </div>
   </div>
 </section>
 
-<section class="cadre faq apparait" id="faq">
-  <p class="surtitre">{t.faq.surtitre}</p>
-  <h2>{t.faq.titre}</h2>
-  <div class="faq__liste">
-    {
-      t.faq.liste.map((q) => (
-        <details>
-          <summary>
-            {q.q}
-            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" aria-hidden="true">
-              <path d="M12 5v14M5 12h14" />
-            </svg>
-          </summary>
-          <p>{q.r}</p>
-        </details>
-      ))
-    }
+<Experience />
+
+<section class="verset" aria-label="Verset">
+  <img src="/photos/mosquee.webp" alt="" loading="lazy" width="1024" height="768" />
+  <div class="bande">
+    <span class="ar" lang="ar">وَقُل رَّبِّ زِدْنِي عِلْمًا</span>
+    <span>{t.verset}</span>
   </div>
 </section>
+
+<!-- Préinscription : les étapes à gauche, le formulaire à droite -->
+<section class="inscription bande" id="preinscription">
+  <div class="cadre">
+    <div class="inscription__boite" data-revele>
+      <div class="inscription__gauche">
+        <p class="surtitre">{f.surtitre}</p>
+        <h2>{f.titre}</h2>
+        <p>{f.intro}</p>
+        <ol class="etapes">
+          {t.etapes.liste.map((e) => <li><b>{e.titre}</b><span>{e.texte}</span></li>)}
+        </ol>
+        <div class="cursus-choisi">
+          <i><svg width="16" height="16" aria-hidden="true"><use href="#coche"></use></svg></i>
+          <span><b>{f.cursusTitre}</b><small set:html={f.cursusTexte} /></span>
+        </div>
+      </div>
+
+      <div class="inscription__droite">
+        <form class="formulaire" data-formulaire data-langue={langue} data-libelle-envoi={f.envoi} novalidate>
+          <div class="piege" aria-hidden="true">
+            <label>Site web <input type="text" name="site_web" tabindex="-1" autocomplete="off" /></label>
+          </div>
+
+          <div class="grille-2">
+            <label class="champ">{f.prenom} *<input type="text" name="prenom" id="prenom" autocomplete="given-name" required maxlength="80" /></label>
+            <label class="champ">{f.nom} *<input type="text" name="nom" id="nom" autocomplete="family-name" required maxlength="80" /></label>
+            <label class="champ">{f.courriel} *<input type="email" name="courriel" id="courriel" autocomplete="email" required maxlength="160" dir="ltr" /></label>
+            <label class="champ">{f.whatsapp} *<input type="tel" name="whatsapp" id="whatsapp" autocomplete="tel" required maxlength="25" placeholder="+33 6 12 34 56 78" dir="ltr" /></label>
+            <label class="champ">{f.pays}
+              <select name="pays" id="pays" autocomplete="country">
+                {f.paysOptions.map((o) => <option value={o.valeur}>{o.libelle}</option>)}
+              </select>
+            </label>
+            <label class="champ">{f.niveau}
+              <select name="niveau" id="niveau">
+                {f.niveauOptions.map((o) => <option value={o.valeur}>{o.libelle}</option>)}
+              </select>
+            </label>
+          </div>
+
+          <fieldset>
+            <legend>{f.creneaux}</legend>
+            <div class="puces">
+              {
+                f.creneauxOptions.map((o) => (
+                  <label class="puce">
+                    <input type="checkbox" name="creneaux" value={o.valeur} id={`creneau-${o.valeur}`} />
+                    {o.libelle}
+                  </label>
+                ))
+              }
+            </div>
+          </fieldset>
+
+          <label class="champ">{f.origine}
+            <select name="origine" id="origine">
+              {f.origineOptions.map((o) => <option value={o.valeur}>{o.libelle}</option>)}
+            </select>
+          </label>
+
+          <div class="accords">
+            <label class="accord"><input type="checkbox" name="majeur" id="majeur" required /><span>{f.majeur} *</span></label>
+            <label class="accord"><input type="checkbox" name="consentement" id="consentement" required /><span>{f.consentement} *</span></label>
+            <label class="accord"><input type="checkbox" name="newsletter" id="newsletter" /><span>{f.newsletter}</span></label>
+          </div>
+
+          {cleTurnstile && <div class="cf-turnstile" data-sitekey={cleTurnstile} data-language={langue} />}
+
+          <p class="message-erreur" data-message-erreur role="alert" hidden>{f.erreurEnvoi}</p>
+
+          <button type="submit" class="btn btn--metal" data-envoyer>{f.envoyer}</button>
+
+          <p class="mentions">
+            {f.mentions} <a href="/confidentialite/">{f.confidentialite}</a>
+          </p>
+        </form>
+
+        <div class="merci" data-merci hidden tabindex="-1">
+          <span class="merci__icone" aria-hidden="true"><svg width="30" height="30"><use href="#coche"></use></svg></span>
+          <h2>{f.merciTitre}</h2>
+          <p set:html={f.merciTexte} />
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section class="faq bande" id="questions">
+  <div class="cadre">
+    <div data-revele>
+      <p class="surtitre">{t.faq.surtitre}</p>
+      <h2>{t.faq.titre}</h2>
+      <p class="contact">{t.faq.contact}<br /><a href={`mailto:${ASSOCIATION.courriel}`}>{ASSOCIATION.courriel}</a></p>
+    </div>
+    <div data-revele>
+      {
+        t.faq.liste.map((q, i) => (
+          <details open={i === 0}>
+            <summary>
+              {q.q}
+              <svg width="18" height="18" aria-hidden="true"><use href="#plus"></use></svg>
+            </summary>
+            <p>{q.r}</p>
+          </details>
+        ))
+      }
+    </div>
+  </div>
+</section>
+
+<div class="barre-mobile" data-barre-mobile>
+  <p><b set:html={t.barreMobile.titre} />{t.barreMobile.texte}</p>
+  <a class="btn btn--metal" href="#preinscription">{t.barreMobile.cta}</a>
+</div>
 
 {cleTurnstile && <script is:inline src="https://challenges.cloudflare.com/turnstile/v0/api.js" async defer></script>}
 

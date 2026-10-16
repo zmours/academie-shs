@@ -1,44 +1,67 @@
 <!doctype html>
-<!-- Source de public/og-image.jpg (aperçu affiché quand on partage le lien sur WhatsApp ou les
-     réseaux). Après modification : `npm run images`. -->
+<!-- Source de public/og-image.jpg : l'aperçu affiché quand on partage le lien sur WhatsApp ou les
+     réseaux (1200 × 630). Composition centrée : quand WhatsApp réduit l'aperçu en vignette carrée,
+     il en garde le centre. Après modification : `npm run images`, puis changer le `v=` de l'image
+     dans src/layouts/Base.astro (WhatsApp garde longtemps l’ancienne).
+     La date et le prix sont écrits en dur : les tenir d’accord avec `RENTREE` (src/data/cours.ts). -->
 <html lang="fr">
 <head>
 <meta charset="utf-8">
-<link rel="stylesheet" href="../node_modules/@fontsource/schibsted-grotesk/700.css">
-<link rel="stylesheet" href="../node_modules/@fontsource/schibsted-grotesk/900.css">
-<link rel="stylesheet" href="../node_modules/@fontsource/noto-naskh-arabic/700.css">
+<link rel="stylesheet" href="../node_modules/@fontsource-variable/fraunces/opsz.css">
+<link rel="stylesheet" href="../node_modules/@fontsource-variable/fraunces/opsz-italic.css">
+<link rel="stylesheet" href="../node_modules/@fontsource/schibsted-grotesk/600.css">
+<link rel="stylesheet" href="../node_modules/@fontsource/amiri/arabic-400.css">
 <style>
+  :root { --profond: #142039; --metal: #C29A4B; --sur-profond: #E8E3D3; --doux: #B9BFCD; }
   html, body { margin: 0; width: 1200px; height: 630px; overflow: hidden; }
-  .visuel { display: grid; grid-template-columns: 1fr 470px; gap: 24px; box-sizing: border-box; width: 1200px; height: 630px; padding: 28px; background: #EBEFE9; font-family: 'Schibsted Grotesk', sans-serif; color: #0E1E1A; }
-  .texte { display: flex; flex-direction: column; justify-content: space-between; padding: 44px; border-radius: 30px; background: #F9FBF7; }
-  .marque { display: flex; align-items: center; gap: 14px; font-size: 28px; font-weight: 900; letter-spacing: -.01em; }
-  .sceau { display: grid; place-items: center; width: 54px; height: 54px; padding-bottom: 6px; box-sizing: border-box; border-radius: 16px; background: #10372F; color: #F0A830; font-family: 'Noto Naskh Arabic', serif; font-size: 30px; line-height: 1; }
-  h1 { margin: 0; font-size: 62px; font-weight: 900; line-height: 1.02; letter-spacing: -.045em; }
-  h1 span { background: linear-gradient(transparent 60%, #F0A830 60%, #F0A830 92%, transparent 92%); color: #10372F; }
-  .pastilles { display: flex; gap: 10px; }
-  .pastille { padding: 9px 15px; border-radius: 100px; background: #EBEFE9; font-size: 18px; font-weight: 700; white-space: nowrap; }
-  .pastille--safran { background: #F0A830; }
-  .photo { position: relative; overflow: hidden; border-radius: 30px; background: #10372F; }
-  .photo img { width: 100%; height: 100%; object-fit: cover; }
-  .photo::after { content: ''; position: absolute; inset: 0; background: linear-gradient(180deg, transparent 50%, rgba(10,30,25,.85)); }
-  .photo b { position: absolute; z-index: 1; left: 28px; right: 28px; bottom: 26px; color: #F9FBF7; font-size: 28px; line-height: 1.15; letter-spacing: -.02em; }
+  .visuel {
+    position: relative; width: 1200px; height: 630px; box-sizing: border-box; overflow: hidden;
+    display: flex; flex-direction: column; align-items: center; justify-content: center; text-align: center;
+    background: var(--profond); color: var(--sur-profond); font-family: 'Schibsted Grotesk', sans-serif;
+  }
+  .visuel img { position: absolute; z-index: 0; inset: 0; width: 100%; height: 100%; object-fit: cover; }
+  .visuel::before {
+    content: ''; position: absolute; z-index: 1; inset: 0;
+    background:
+      radial-gradient(52% 62% at 50% 50%, rgba(20, 32, 57, .9) 40%, rgba(20, 32, 57, .62) 100%),
+      linear-gradient(180deg, rgba(20, 32, 57, .1), rgba(20, 32, 57, .45));
+  }
+  .visuel > *:not(img) { position: relative; z-index: 2; }
+  .sceau { width: 100px; height: 100px; }
+  .marque { margin-top: 14px; font: 600 18px/1 'Schibsted Grotesk', sans-serif; letter-spacing: .22em; text-transform: uppercase; color: var(--metal); }
+  h1 {
+    margin: 22px 0 0; max-width: 920px; text-wrap: balance; font-family: 'Fraunces Variable', Georgia, serif; font-weight: 400;
+    font-size: 64px; line-height: 1.08; letter-spacing: -.02em;
+  }
+  h1 em { color: var(--metal); }
+  .cursus { margin: 16px 0 0; font-size: 24px; color: var(--sur-profond); opacity: .85; }
+  .pastilles { display: flex; gap: 12px; margin-top: 30px; }
+  .pastille { padding: 11px 20px; border-radius: 100px; font-size: 21px; font-weight: 600; border: 1.5px solid rgba(232, 227, 211, .35); white-space: nowrap; }
+  .pastille--metal { background: var(--metal); border-color: var(--metal); color: var(--profond); }
+  sup { font-size: .62em; line-height: 0; }
+  .visuel > .adresse { position: absolute; z-index: 2; bottom: 26px; margin: 0; font-size: 18px; letter-spacing: .08em; color: var(--doux); }
 </style>
 </head>
 <body>
 <div class="visuel">
-  <div class="texte">
-    <div class="marque"><span class="sceau">ع</span>Académie SHS</div>
-    <h1>Études islamiques et sociales, <span>un cursus en trois ans.</span></h1>
-    <div class="pastilles">
-      <span class="pastille pastille--safran">Préinscriptions ouvertes</span>
-      <span class="pastille">En direct</span>
-      <span class="pastille">3 ans, pour adultes</span>
-    </div>
+  <img src="../public/photos/boukhara.webp" alt="">
+  <svg class="sceau" viewBox="0 0 200 200" aria-hidden="true">
+    <path id="cercle" d="M100,100 m-72,0 a72,72 0 1,1 144,0 a72,72 0 1,1 -144,0" fill="none"></path>
+    <circle cx="100" cy="100" r="98" fill="#C29A4B"></circle>
+    <circle cx="100" cy="100" r="90" fill="none" stroke="#142039" stroke-width="1" opacity=".5"></circle>
+    <circle cx="100" cy="100" r="52" fill="#142039"></circle>
+    <text font-family="Schibsted Grotesk, sans-serif" font-size="11" font-weight="600" letter-spacing="1.5" fill="#142039"><textPath href="#cercle">ACADÉMIE SHS · SCIENCES HUMAINES ET SOCIALES · 2023 ·</textPath></text>
+    <text x="100" y="122" text-anchor="middle" font-family="Amiri, serif" font-size="64" fill="#C29A4B">ع</text>
+  </svg>
+  <p class="marque">Académie SHS</p>
+  <h1>Les sciences islamiques, <em>étudiées avec méthode.</em></h1>
+  <p class="cursus">Études islamiques et sociales · un cursus en trois ans</p>
+  <div class="pastilles">
+    <span class="pastille pastille--metal">Rentrée le 1<sup>er</sup> novembre 2026</span>
+    <span class="pastille">En ligne et en direct</span>
+    <span class="pastille">400 € l’année</span>
   </div>
-  <div class="photo">
-    <img src="../public/photos/calligraphie.webp" alt="">
-    <b>academie-shs.fr</b>
-  </div>
+  <p class="adresse">academie-shs.fr</p>
 </div>
 </body>
 </html>

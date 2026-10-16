@@ -15,7 +15,8 @@ capturer() {
 }
 
 capturer outils/og-image.html 1200 630 "$TMP/og.png"
-sips -s format jpeg -s formatOptions 88 "$TMP/og.png" --out public/og-image.jpg >/dev/null
+# Qualité 80 : WhatsApp n'affiche plus l'aperçu au-delà d'environ 300 Ko.
+sips -s format jpeg -s formatOptions 80 "$TMP/og.png" --out public/og-image.jpg >/dev/null
 
 capturer outils/apple-touch-icon.html 180 180 public/apple-touch-icon.png
 

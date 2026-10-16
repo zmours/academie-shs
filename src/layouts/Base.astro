@@ -1,14 +1,17 @@
 ---
+// Polices servies par le site lui-même (aucune requête vers Google) : Fraunces pour les titres,
+// Schibsted Grotesk pour le texte, Amiri pour l'arabe. Readex Pro reste pour une future version
+// arabe (texte courant de droite à gauche).
+import '@fontsource-variable/fraunces/opsz.css';
+import '@fontsource-variable/fraunces/opsz-italic.css';
 import '@fontsource/schibsted-grotesk/400.css';
 import '@fontsource/schibsted-grotesk/500.css';
+import '@fontsource/schibsted-grotesk/600.css';
 import '@fontsource/schibsted-grotesk/700.css';
-import '@fontsource/schibsted-grotesk/800.css';
-import '@fontsource/schibsted-grotesk/900.css';
+import '@fontsource/amiri/arabic-400.css';
+import '@fontsource/amiri/arabic-700.css';
 import '@fontsource/readex-pro/400.css';
 import '@fontsource/readex-pro/500.css';
-import '@fontsource/readex-pro/700.css';
-import '@fontsource/noto-naskh-arabic/500.css';
-import '@fontsource/noto-naskh-arabic/700.css';
 import '../styles/global.css';
 
 import type { Langue } from '../data/cours';
@@ -23,28 +26,28 @@ interface Props {
 // Le site n'est publié qu'en français depuis le 11/10/2026 : pas de sélecteur de langue ni de
 // versions alternatives déclarées. La mise en page reste prête pour l'arabe (dir="rtl").
 const { langue } = Astro.props;
-const t = TEXTES[langue];
+const t = TEXTES;
 const titre = Astro.props.titre ?? t.meta.titre;
 const description = Astro.props.description ?? t.meta.description;
 const site = Astro.site ?? new URL('https://academie-shs.fr');
 const canonique = new URL(Astro.url.pathname, site).href;
-const image = new URL('/og-image.jpg', site).href;
-const accueilLangue = CHEMINS[langue];
+// WhatsApp garde longtemps l'aperçu d'une image : changer `v` à chaque nouvelle image de partage.
+const image = new URL('/og-image.jpg?v=2026-10-16b', site).href;
+const accueil = CHEMINS[langue];
 const LOCALE_OG: Record<Langue, string> = { fr: 'fr_FR', ar: 'ar_AR', en: 'en_GB' };
-const nomPied = langue === 'en' ? ASSOCIATION.nomAnglais : langue === 'ar' ? ASSOCIATION.nomArabe : ASSOCIATION.nom;
 ---
 
 <!doctype html>
 <html lang={langue} dir={DIRECTION[langue]}>
   <head>
     <meta charset="utf-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
     <title>{titre}</title>
     <meta name="description" content={description} />
     <link rel="canonical" href={canonique} />
     <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
     <link rel="apple-touch-icon" href="/apple-touch-icon.png" />
-    <meta name="theme-color" content="#10372F" />
+    <meta name="theme-color" content="#142039" />
 
     <meta property="og:type" content="website" />
     <meta property="og:site_name" content="Académie SHS" />
@@ -52,26 +55,66 @@ const nomPied = langue === 'en' ? ASSOCIATION.nomAnglais : langue === 'ar' ? ASS
     <meta property="og:description" content={description} />
     <meta property="og:url" content={canonique} />
     <meta property="og:image" content={image} />
+    <meta property="og:image:secure_url" content={image} />
+    <meta property="og:image:type" content="image/jpeg" />
     <meta property="og:image:width" content="1200" />
     <meta property="og:image:height" content="630" />
+    <meta property="og:image:alt" content="Académie SHS — Les sciences islamiques, étudiées avec méthode. Études islamiques et sociales, un cursus en trois ans." />
     <meta property="og:locale" content={LOCALE_OG[langue]} />
     <meta name="twitter:card" content="summary_large_image" />
+    <!-- Pose la classe du mouvement avant le premier affichage, pour que l'ouverture ne clignote
+         pas. Mêmes conditions que `mouvement()` dans src/scripts/interactions.ts. -->
+    <script is:inline>
+      if ('IntersectionObserver' in window && !matchMedia('(prefers-reduced-motion: reduce)').matches) {
+        document.documentElement.classList.add('anime');
+        // Filet de sécurité : si le script de la page ne démarre pas, tout redevient visible.
+        setTimeout(function () {
+          if (!document.documentElement.dataset.mouvement) document.documentElement.classList.remove('anime');
+        }, 3000);
+      }
+    </script>
   </head>
   <body>
-    <a class="evitement" href="#contenu">{langue === 'ar' ? 'انتقل إلى المحتوى' : langue === 'en' ? 'Skip to content' : 'Aller au contenu'}</a>
+    <a class="evitement" href="#contenu">{t.nav.evitement}</a>
 
-    <header class="nav" data-nav>
-      <div class="cadre nav__barre">
-        <a href={accueilLangue} class="logo">
-          <span class="logo__sceau" aria-hidden="true">ع</span>
-          <span>{langue === 'ar' ? 'الأكاديمية' : 'Académie SHS'}</span>
+    <!-- Le sceau (grand format), le médaillon (logo) et les pictogrammes communs -->
+    <svg width="0" height="0" class="symboles" aria-hidden="true">
+      <defs>
+        <symbol id="sceau" viewBox="0 0 200 200">
+          <path id="cercle-texte" d="M100,100 m-72,0 a72,72 0 1,1 144,0 a72,72 0 1,1 -144,0" fill="none"></path>
+          <circle cx="100" cy="100" r="98" fill="var(--metal)"></circle>
+          <circle cx="100" cy="100" r="90" fill="none" stroke="var(--profond)" stroke-width="1" opacity=".5"></circle>
+          <circle cx="100" cy="100" r="52" fill="var(--profond)"></circle>
+          <text font-family="Schibsted Grotesk, Arial, sans-serif" font-size="11" font-weight="600" letter-spacing="1.5" fill="var(--profond)">
+            <textPath href="#cercle-texte">ACADÉMIE SHS · SCIENCES HUMAINES ET SOCIALES · 2023 ·</textPath>
+          </text>
+          <text x="100" y="122" text-anchor="middle" font-family="Amiri, serif" font-size="64" fill="var(--metal)">ع</text>
+        </symbol>
+        <symbol id="medaillon" viewBox="0 0 100 100">
+          <circle cx="50" cy="50" r="49" fill="var(--metal)"></circle>
+          <circle cx="50" cy="50" r="40" fill="var(--profond)"></circle>
+          <text x="50" y="64" text-anchor="middle" font-family="Amiri, serif" font-size="44" fill="var(--metal)">ع</text>
+        </symbol>
+        <symbol id="coche" viewBox="0 0 24 24"><path d="M20 6L9 17l-5-5" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"></path></symbol>
+        <symbol id="fleche" viewBox="0 0 24 24"><path d="M5 12h14M13 6l6 6-6 6" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"></path></symbol>
+        <symbol id="plus" viewBox="0 0 24 24"><path d="M12 5v14M5 12h14" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round"></path></symbol>
+        <symbol id="lecture" viewBox="0 0 24 24"><path d="M7 4.5v15l13-7.5z" fill="currentColor"></path></symbol>
+      </defs>
+    </svg>
+
+    <header class="entete bande" data-entete>
+      <div class="cadre">
+        <a class="marque" href={accueil} aria-label="Académie SHS, accueil">
+          <svg width="42" height="42" aria-hidden="true"><use href="#medaillon"></use></svg>
+          <span><b>Académie SHS</b><small>Sciences humaines et sociales</small></span>
         </a>
-        <nav class="nav__liens" aria-label={t.nav.principale}>
-          <a href={`${accueilLangue}#enligne`}>{t.nav.enligne}</a>
-          <a href={`${accueilLangue}#programme`}>{t.nav.cursus}</a>
-          <a href={`${accueilLangue}#faq`}>{t.nav.faq}</a>
+        <nav class="nav" aria-label={t.nav.principale}>
+          <a href={`${accueil}#cursus`}>{t.nav.cursus}</a>
+          <a href={`${accueil}#rentree`}>{t.nav.rentree}</a>
+          <a href={`${accueil}#enligne`}>{t.nav.enligne}</a>
+          <a href={`${accueil}#questions`}>{t.nav.faq}</a>
+          <a class="btn btn--encre" href={`${accueil}#preinscription`}>{t.nav.cta}</a>
         </nav>
-        <a href={`${accueilLangue}#preinscription`} class="btn nav__cta">{t.nav.cta}</a>
       </div>
     </header>
 
@@ -79,21 +122,18 @@ const nomPied = langue === 'en' ? ASSOCIATION.nomAnglais : langue === 'ar' ? ASS
       <slot />
     </main>
 
-    <footer class="pied">
-      <div class="cadre pied__colonnes">
-        <div class="pied__colonne">
-          <span class="logo"><span class="logo__sceau" aria-hidden="true">ع</span>Académie SHS</span>
-          <span>{nomPied}</span>
+    <footer class="pied profond bande">
+      <div class="cadre">
+        <div>
+          <b>{ASSOCIATION.nom}</b>
+          <p>{t.pied.statut} · SIREN {ASSOCIATION.siren}<br />{ASSOCIATION.adresse}, {ASSOCIATION.ville}</p>
         </div>
-        <div class="pied__colonne">
-          <b>{t.pied.association}</b>
-          <span>{t.pied.statut}</span>
-          <span>SIREN {ASSOCIATION.siren}</span>
-          <span lang="fr">{ASSOCIATION.adresse}, {ASSOCIATION.ville}</span>
-        </div>
-        <div class="pied__colonne">
-          <b>{t.pied.contact}</b>
+        <div>
+          <h2>{t.pied.contact}</h2>
           <a href={`mailto:${ASSOCIATION.courriel}`}>{ASSOCIATION.courriel}</a>
+        </div>
+        <div>
+          <h2>{t.pied.association}</h2>
           <a href="/mentions-legales/">{t.pied.mentionsLegales}</a>
           <a href="/confidentialite/">{t.pied.confidentialite}</a>
         </div>
