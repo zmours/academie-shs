@@ -144,18 +144,6 @@ sup {
   font-family: var(--arabe);
   direction: rtl;
 }
-.provisoire {
-  position: absolute;
-  z-index: 3;
-  top: 14px;
-  right: 14px;
-  font-size: 12px;
-  font-weight: 600;
-  padding: 5px 10px;
-  border-radius: 6px;
-  background: rgba(0, 0, 0, 0.5);
-  color: #fff;
-}
 
 /* ——— Boutons ——— */
 .btn {
@@ -386,8 +374,12 @@ html[dir='rtl'] .btn:hover svg {
   background: var(--profond);
   box-shadow: 0 30px 60px -30px color-mix(in srgb, var(--profond) 60%, transparent);
 }
+/* Sans vidéo : la photo seule, sans légende ni voile sombre. */
 .video__cadre--photo {
   cursor: default;
+}
+.video__cadre--photo::after {
+  display: none;
 }
 .video__cadre img {
   width: 100%;
@@ -2196,11 +2188,6 @@ legend {
     left: auto;
     right: -4px;
     top: -34px;
-  }
-  .video .provisoire {
-    top: auto;
-    bottom: 12px;
-    right: 12px;
   }
   .video__lecture {
     width: 68px;

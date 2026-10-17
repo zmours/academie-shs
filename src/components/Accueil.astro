@@ -62,21 +62,11 @@ const suivantes = ANNEES.filter((a) => a !== premiere);
         ) : (
           <div class="video__cadre video__cadre--photo">
             <img src="/photos/boukhara.webp" alt={t.hero.photoAlt} width="1100" height="733" fetchpriority="high" />
-            <span class="video__legende">
-              <span><b set:html={t.hero.legendeTitre} /><span>{t.hero.legendeTexte}</span></span>
-            </span>
-            <span class="provisoire">{t.provisoire}</span>
           </div>
         )
       }
       <svg class="sceau" viewBox="0 0 200 200" aria-hidden="true"><use href="#sceau"></use></svg>
-      {
-        video ? (
-          <figcaption class="video__sous"><b>{t.hero.videoTitre}</b><span>{VIDEO_PRESENTATION.duree}</span></figcaption>
-        ) : (
-          <figcaption class="video__sous"><b set:html={t.hero.legendeTitre} /><span>{t.hero.legendeTexte}</span></figcaption>
-        )
-      }
+      {video && <figcaption class="video__sous"><b>{t.hero.videoTitre}</b><span>{VIDEO_PRESENTATION.duree}</span></figcaption>}
     </figure>
   </div>
 </section>

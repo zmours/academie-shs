@@ -74,7 +74,6 @@ const NB_SEANCES = RENTREE.seances.length === 2 ? 'deux' : String(RENTREE.seance
 export interface Textes {
   meta: { titre: string; description: string };
   nav: { cursus: string; rentree: string; enligne: string; faq: string; cta: string; principale: string; evitement: string };
-  provisoire: string;
   hero: {
     /** html */
     pastille: string;
@@ -86,9 +85,6 @@ export interface Textes {
     ctaVideo: string;
     ctaProgramme: string;
     photoAlt: string;
-    /** html */
-    legendeTitre: string;
-    legendeTexte: string;
     videoTitre: string;
     videoTexte: string;
     videoLire: string;
@@ -229,7 +225,6 @@ export const TEXTES: Textes = {
     principale: 'Navigation principale',
     evitement: 'Aller au contenu',
   },
-  provisoire: 'Photo provisoire',
   hero: {
     pastille: `Rentrée ${DEBUT} · préinscriptions ouvertes`,
     titreDebut: 'Les sciences islamiques, ',
@@ -241,8 +236,6 @@ export const TEXTES: Textes = {
     ctaVideo: 'Voir la présentation',
     ctaProgramme: 'Voir le programme',
     photoAlt: 'La cour d’une mosquée de Boukhara, ses murs couverts de faïence bleue',
-    legendeTitre: 'Maîtriser la tradition, comprendre son temps.',
-    legendeTexte: 'En ligne et en direct, pour adultes',
     videoTitre: 'Présentation de l’Académie',
     videoTexte: 'Le cursus, les enseignants, une séance en direct',
     videoLire: 'Lire la vidéo de présentation de l’Académie',

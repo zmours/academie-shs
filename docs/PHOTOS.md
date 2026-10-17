@@ -2,8 +2,8 @@
 
 Les photos de `public/photos/` sont **provisoires**, en attendant celles de l'Académie. Elles sont
 toutes dans le domaine public ou sous licence CC0 (aucune attribution obligatoire), trouvées le
-11/10/2026 par le moteur [Openverse](https://openverse.org). Chacune est marquée « Photo provisoire »
-sur la page.
+11/10/2026 par le moteur [Openverse](https://openverse.org). Depuis le 17/10/2026, elles ne sont
+plus marquées « Photo provisoire » sur la page (demande de l'association).
 
 | Fichier | Sujet | Où | Source |
 |---|---|---|---|

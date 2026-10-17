@@ -73,8 +73,8 @@ enregistré dans Brevo (`MODULES`), et les segments le cherchent.
 
 ## Les photos
 
-Les photos de `public/photos/` sont **provisoires** (domaine public ou CC0) et marquées comme telles
-sur la page. Leur provenance est dans [`docs/PHOTOS.md`](docs/PHOTOS.md). Pour en remplacer une,
+Les photos de `public/photos/` sont **provisoires** (domaine public ou CC0), sans mention sur la
+page depuis le 17/10/2026. Leur provenance est dans [`docs/PHOTOS.md`](docs/PHOTOS.md). Pour en remplacer une,
 garder le même nom de fichier (format WebP, 1 000 à 1 200 px de large).
 
 ## Mettre en ligne
@@ -155,6 +155,6 @@ Pour chaque domaine (`.fr` puis `.com`) :
 - [ ] Mentions légales : renseigner le **numéro RNA** et le **directeur de la publication**
       (`src/pages/mentions-legales.astro`, passages surlignés « À compléter »).
 - [ ] Créer la boîte `contact@academie-shs.fr`, citée partout sur le site.
-- [ ] Remplacer les photos provisoires, `calligraphie.webp` en premier (`docs/PHOTOS.md`).
+- [ ] Remplacer les photos provisoires par celles de l'Académie (`docs/PHOTOS.md`).
 - [ ] Attributs Brevo créés, Turnstile branché, une préinscription de test reçue puis supprimée.
 - [ ] Partager le lien dans WhatsApp pour vérifier l'aperçu (`public/og-image.jpg`).
