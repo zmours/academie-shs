@@ -16,8 +16,7 @@ import { ASSOCIATION, VERSION_CONSENTEMENT } from '../i18n/textes';
     <h2>Responsable du traitement</h2>
     <p>
       L'association <strong>{ASSOCIATION.nom}</strong>, {ASSOCIATION.adresse}, {ASSOCIATION.ville}
-      (SIREN {ASSOCIATION.siren}). Pour toute question :
-      <a href={`mailto:${ASSOCIATION.courriel}`}>{ASSOCIATION.courriel}</a>.
+      (SIREN {ASSOCIATION.siren}). Pour toute question, écrivez à l'association à cette adresse.
     </p>
 
     <h2>Données recueillies</h2>
@@ -62,8 +61,8 @@ import { ASSOCIATION, VERSION_CONSENTEMENT } from '../i18n/textes';
     <h2>Vos droits</h2>
     <p>
       Vous pouvez demander l'accès à vos données, leur rectification, leur effacement, la limitation du
-      traitement ou leur portabilité, et vous opposer à leur traitement, en écrivant à
-      <a href={`mailto:${ASSOCIATION.courriel}`}>{ASSOCIATION.courriel}</a>. Vous pouvez aussi adresser
+      traitement ou leur portabilité, et vous opposer à leur traitement, par courrier adressé à
+      l'association : {ASSOCIATION.nom}, {ASSOCIATION.adresse}, {ASSOCIATION.ville}. Vous pouvez aussi adresser
       une réclamation à la CNIL (<a href="https://www.cnil.fr" rel="noopener">cnil.fr</a>).
     </p>
 
@@ -75,6 +74,6 @@ import { ASSOCIATION, VERSION_CONSENTEMENT } from '../i18n/textes';
       Cloudflare peut utiliser des données techniques strictement nécessaires à son fonctionnement.
     </p>
 
-    <p style="margin-top: 36px; font-size: 14px; color: var(--gris)">Version du {VERSION_CONSENTEMENT.split('-').reverse().join('/')}.</p>
+    <p style="margin-top: 36px; font-size: 14px; color: var(--sourdine)">Version du {VERSION_CONSENTEMENT.split('-').reverse().join('/')}.</p>
   </article>
 </Base>

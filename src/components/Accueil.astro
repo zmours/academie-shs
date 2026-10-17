@@ -6,7 +6,7 @@
 // `worker/preinscription.ts` avant d'aller dans Brevo : garder les `name` des champs et les
 // valeurs des listes tels quels.
 import { ANNEES, COMPETENCES, FIN_ETUDES, type Langue } from '../data/cours';
-import { ASSOCIATION, TEXTES, VIDEO_PRESENTATION } from '../i18n/textes';
+import { TEXTES, VIDEO_PRESENTATION } from '../i18n/textes';
 import Experience from './Experience.astro';
 
 interface Props {
@@ -298,7 +298,6 @@ const suivantes = ANNEES.filter((a) => a !== premiere);
     <div data-revele>
       <p class="surtitre">{t.faq.surtitre}</p>
       <h2>{t.faq.titre}</h2>
-      <p class="contact">{t.faq.contact}<br /><a href={`mailto:${ASSOCIATION.courriel}`}>{ASSOCIATION.courriel}</a></p>
     </div>
     <div data-revele>
       {

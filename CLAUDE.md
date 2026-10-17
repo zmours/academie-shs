@@ -30,6 +30,9 @@ programme restent dans `src/data/cours.ts`. `/ar/` et `/en/` redirigent vers l'a
 - Le programme (`src/data/cours.ts`) reprend **mot pour mot** `cursus.md`, le document de
   l'association : ne rien reformuler, ne rien ajouter. L'introduction et les objectifs généraux
   aussi (`src/i18n/textes.ts`). Exceptions : « étudiant » devient « apprenant » ; et depuis le 16/10/2026, en 1re année, « Contexte historique et enseignements spirituels et sociaux » devient le contenu de la Sīra (le tableau horaire de l'association compte six matières, « Sīra avec contexte »).
+- **Aucune adresse électronique sur le site** (17/10/2026) : `contact@academie-shs.fr` était reprise
+  par des robots de spam. Le contact se fait par courrier au siège ; un formulaire de contact ou un
+  numéro de téléphone viendront plus tard.
 - `CODE_CURSUS` (`src/data/cours.ts`) est enregistré dans Brevo : ne jamais le changer une fois
   des préinscriptions reçues.
 - La section « Cours en ligne » ne montre que ce que l'outil de cours fait réellement (pas de

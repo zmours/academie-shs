@@ -315,7 +315,7 @@ export const TEXTES_ARCHIVE: Record<'ar' | 'en', TextesArchive> = {
       mentions:
         'تُستعمل معطياتك فقط لتنظيم الدخول الدراسي. المسؤول عن المعالجة: جمعية الأكاديمية الفرنسية للعلوم الإنسانية والاجتماعية.',
       confidentialite: 'سياسة الخصوصية',
-      erreurEnvoi: 'تعذّر إرسال التسجيل. تحقّق من الحقول وأعد المحاولة، أو راسلنا على contact@academie-shs.fr.',
+      erreurEnvoi: 'تعذّر إرسال التسجيل. تحقّق من الحقول وأعد المحاولة بعد قليل.',
       merciTitre: 'شكرًا، تمّ تسجيلك!',
       merciTexte: 'سجّلنا تسجيلك المسبق، وستصلك المواعيد والرسوم قبل غيرك.',
     },
@@ -533,7 +533,7 @@ export const TEXTES_ARCHIVE: Record<'ar' | 'en', TextesArchive> = {
       mentions:
         'Your data is used only to organise the new academic year. Data controller: the association Académie française des sciences humaines et sociales.',
       confidentialite: 'Privacy policy',
-      erreurEnvoi: 'Sending failed. Check the fields and try again, or email us at contact@academie-shs.fr.',
+      erreurEnvoi: 'Sending failed. Check the fields and try again in a moment.',
       merciTitre: 'Thank you, you’re registered!',
       merciTexte: 'Your pre-registration has been recorded. You will be the first to receive dates and fees.',
     },

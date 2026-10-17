@@ -154,7 +154,7 @@ Pour chaque domaine (`.fr` puis `.com`) :
 
 - [ ] Mentions légales : renseigner le **numéro RNA** et le **directeur de la publication**
       (`src/pages/mentions-legales.astro`, passages surlignés « À compléter »).
-- [ ] Créer la boîte `contact@academie-shs.fr`, citée partout sur le site.
+- [ ] Prévoir un moyen de contact sans adresse électronique publiée (formulaire de contact, numéro de téléphone) : `contact@academie-shs.fr` a été retirée du site le 17/10/2026, reprise par des robots de spam.
 - [ ] Remplacer les photos provisoires par celles de l'Académie (`docs/PHOTOS.md`).
 - [ ] Attributs Brevo créés, Turnstile branché, une préinscription de test reçue puis supprimée.
 - [ ] Partager le lien dans WhatsApp pour vérifier l'aperçu (`public/og-image.jpg`).

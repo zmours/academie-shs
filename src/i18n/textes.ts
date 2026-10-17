@@ -22,11 +22,14 @@ export const ASSOCIATION = {
   siren: '924 544 448',
   adresse: '5 B rue Hubert Latham',
   ville: '76800 Saint-Étienne-du-Rouvray',
-  courriel: 'contact@academie-shs.fr',
 };
 
-/** Version de la politique de confidentialité, enregistrée dans Brevo avec chaque préinscription. */
-export const VERSION_CONSENTEMENT = '2026-10-11';
+/**
+ * Version de la politique de confidentialité, enregistrée dans Brevo avec chaque préinscription.
+ * 17/10/2026 : plus d'adresse électronique (reprise par des robots de spam) ; on écrit au siège.
+ * ⚠️ Ne publier aucune adresse électronique sur le site.
+ */
+export const VERSION_CONSENTEMENT = '2026-10-17';
 
 /**
  * La vidéo de présentation. Tant que `youtube` est vide, l'ouverture montre une photo, sans bouton
@@ -201,14 +204,14 @@ export interface Textes {
     /** html */
     merciTexte: string;
   };
-  faq: { surtitre: string; titre: string; contact: string; liste: { q: string; r: string }[] };
+  faq: { surtitre: string; titre: string; liste: { q: string; r: string }[] };
   barreMobile: {
     /** html */
     titre: string;
     texte: string;
     cta: string;
   };
-  pied: { association: string; statut: string; contact: string; mentionsLegales: string; confidentialite: string };
+  pied: { association: string; statut: string; mentionsLegales: string; confidentialite: string };
 }
 
 export const TEXTES: Textes = {
@@ -426,14 +429,13 @@ export const TEXTES: Textes = {
       'Vos données servent uniquement à organiser la rentrée. Responsable du traitement : l’association Académie française des sciences humaines et sociales.',
     confidentialite: 'Politique de confidentialité',
     erreurEnvoi:
-      'L’envoi n’a pas abouti. Vérifiez les champs et réessayez, ou écrivez-nous à contact@academie-shs.fr.',
+      'L’envoi n’a pas abouti. Vérifiez les champs et réessayez dans quelques instants.',
     merciTitre: 'Merci, c’est noté !',
     merciTexte: `Votre préinscription est enregistrée. L’Académie vous recontacte avant la rentrée, ${RENTREE.debut}.`,
   },
   faq: {
     surtitre: 'Questions',
     titre: 'Vos questions',
-    contact: 'Une autre question ? Écrivez-nous :',
     liste: [
       {
         q: 'Combien coûte le cursus ?',
@@ -467,7 +469,6 @@ export const TEXTES: Textes = {
   pied: {
     association: 'L’association',
     statut: 'Association loi 1901',
-    contact: 'Contact',
     mentionsLegales: 'Mentions légales',
     confidentialite: 'Politique de confidentialité',
   },
