@@ -467,6 +467,11 @@ html[dir='rtl'] .btn:hover svg {
 .video__sous {
   display: none;
 }
+.video__avis {
+  margin-top: 12px;
+  font-size: 13px;
+  color: var(--sourdine);
+}
 .video .sceau {
   position: absolute;
   z-index: 3;

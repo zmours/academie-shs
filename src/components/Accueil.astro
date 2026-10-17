@@ -67,6 +67,7 @@ const suivantes = ANNEES.filter((a) => a !== premiere);
       }
       <svg class="sceau" viewBox="0 0 200 200" aria-hidden="true"><use href="#sceau"></use></svg>
       {video && <figcaption class="video__sous"><b>{t.hero.videoTitre}</b><span>{VIDEO_PRESENTATION.duree}</span></figcaption>}
+      {video && <p class="video__avis">{t.hero.videoAvis}</p>}
     </figure>
   </div>
 </section>
@@ -320,7 +321,6 @@ const suivantes = ANNEES.filter((a) => a !== premiere);
   <a class="btn btn--metal" href="#preinscription">{t.barreMobile.cta}</a>
 </div>
 
-{cleTurnstile && <script is:inline src="https://challenges.cloudflare.com/turnstile/v0/api.js" async defer></script>}
 
 <script>
   import { demarrer } from '../scripts/preinscription';

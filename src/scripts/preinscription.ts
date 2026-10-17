@@ -1,33 +1,43 @@
 // Envoi du formulaire de préinscription au cursus, vers `/api/preinscription` (worker/).
 //
 // Depuis le 11/10/2026, on se préinscrit au cursus complet : plus de cours à cocher, la fonction
-// serveur enregistre elle-même le cursus. Rien n'est gardé dans le navigateur, sauf la provenance
-// de la visite (paramètres utm_*), le temps de la session.
+// serveur enregistre elle-même le cursus.
+//
+// Rien n'est écrit dans le navigateur (ni cookie, ni stockage) : c'est ce qui dispense le site de
+// bandeau de consentement (17/10/2026). La provenance d'une campagne (paramètres utm_*) est lue
+// dans l'adresse de la page au moment de l'envoi. Le contrôle anti-robot de Cloudflare (Turnstile)
+// n'est chargé qu'à la première interaction avec le formulaire : une simple visite n'appelle aucun
+// service tiers.
 
-const CLE_UTM = 'academie-shs:utm';
 const PARAMETRES_UTM = ['utm_source', 'utm_medium', 'utm_campaign'] as const;
+const SCRIPT_TURNSTILE = 'https://challenges.cloudflare.com/turnstile/v0/api.js';
 
-function memoriserUtm(): void {
+function lireUtm(): Record<string, string> {
   const params = new URLSearchParams(window.location.search);
   const utm: Record<string, string> = {};
   for (const p of PARAMETRES_UTM) {
     const v = params.get(p);
     if (v) utm[p] = v.slice(0, 100);
   }
-  if (Object.keys(utm).length === 0) return;
-  try {
-    sessionStorage.setItem(CLE_UTM, JSON.stringify(utm));
-  } catch {
-    // Navigation privée ou stockage bloqué : la provenance n'est simplement pas transmise.
-  }
+  return utm;
 }
 
-function lireUtm(): Record<string, string> {
-  try {
-    return JSON.parse(sessionStorage.getItem(CLE_UTM) ?? '{}');
-  } catch {
-    return {};
+/** Charge Turnstile une seule fois ; il affiche alors lui-même son contrôle dans `.cf-turnstile`. */
+function chargerTurnstile(): void {
+  if (document.querySelector(`script[src="${SCRIPT_TURNSTILE}"]`)) return;
+  const script = document.createElement('script');
+  script.src = SCRIPT_TURNSTILE;
+  script.async = true;
+  document.head.append(script);
+}
+
+/** Le jeton Turnstile, attendu jusqu'à 8 s si le contrôle n'a pas encore fini (envoi très rapide). */
+async function jetonTurnstile(formulaire: HTMLFormElement): Promise<string> {
+  const lire = () => formulaire.querySelector<HTMLInputElement>('[name="cf-turnstile-response"]')?.value ?? '';
+  for (let attente = 0; !lire() && attente < 8000; attente += 200) {
+    await new Promise((fin) => setTimeout(fin, 200));
   }
+  return lire();
 }
 
 export function demarrer(): void {
@@ -35,7 +45,13 @@ export function demarrer(): void {
   if (!formulaire) return;
   const langue = formulaire.dataset.langue ?? 'fr';
 
-  memoriserUtm();
+  // Turnstile : chargé dès que le visiteur touche au formulaire, le temps qu'il le remplisse.
+  const avecTurnstile = formulaire.querySelector('.cf-turnstile') !== null;
+  if (avecTurnstile) {
+    for (const evenement of ['focusin', 'pointerdown'] as const) {
+      formulaire.addEventListener(evenement, chargerTurnstile, { once: true });
+    }
+  }
 
   function valeursCochees(nom: string): string[] {
     return Array.from(formulaire!.querySelectorAll<HTMLInputElement>(`input[name="${nom}"]:checked`)).map(
@@ -61,6 +77,11 @@ export function demarrer(): void {
     messageErreur.hidden = true;
     if (!valider()) return;
 
+    boutonEnvoi.disabled = true;
+    boutonEnvoi.textContent = formulaire.dataset.libelleEnvoi ?? libelleEnvoyer;
+    if (avecTurnstile) chargerTurnstile();
+    const turnstile = avecTurnstile ? await jetonTurnstile(formulaire) : '';
+
     const donnees = new FormData(formulaire);
     const charge = {
       prenom: String(donnees.get('prenom') ?? ''),
@@ -76,12 +97,9 @@ export function demarrer(): void {
       newsletter: donnees.get('newsletter') === 'on',
       langueSite: langue,
       siteWeb: String(donnees.get('site_web') ?? ''),
-      turnstile: String(donnees.get('cf-turnstile-response') ?? ''),
+      turnstile,
       utm: lireUtm(),
     };
-
-    boutonEnvoi.disabled = true;
-    boutonEnvoi.textContent = formulaire.dataset.libelleEnvoi ?? libelleEnvoyer;
 
     try {
       const reponse = await fetch('/api/preinscription', {

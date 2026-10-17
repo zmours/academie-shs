@@ -68,10 +68,12 @@ import { ASSOCIATION, VERSION_CONSENTEMENT } from '../i18n/textes';
 
     <h2>Cookies et stockage</h2>
     <p>
-      Le site ne dépose aucun cookie publicitaire ni de mesure d'audience. Si vous arrivez par un lien de
-      campagne, il garde le temps de votre visite, dans votre navigateur, la provenance indiquée par ce
-      lien (paramètres « utm »), transmise avec votre préinscription. La vérification anti-robot de
-      Cloudflare peut utiliser des données techniques strictement nécessaires à son fonctionnement.
+      Le site ne dépose aucun cookie et n'enregistre rien dans votre navigateur : il n'y a ni publicité
+      ni mesure d'audience. Si vous arrivez par un lien de campagne, la provenance indiquée dans
+      l'adresse de la page (paramètres « utm ») est transmise avec votre préinscription. La
+      vérification anti-robot de Cloudflare (Turnstile) ne se charge que lorsque vous commencez à
+      remplir le formulaire ; elle n'utilise que les données techniques strictement nécessaires à la
+      sécurité du formulaire.
     </p>
 
     <p style="margin-top: 36px; font-size: 14px; color: var(--sourdine)">Version du {VERSION_CONSENTEMENT.split('-').reverse().join('/')}.</p>

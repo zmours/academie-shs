@@ -34,8 +34,9 @@ export const VERSION_CONSENTEMENT = '2026-10-17';
 /**
  * La vidéo de présentation. Tant que `youtube` est vide, l'ouverture montre une photo, sans bouton
  * de lecture. Pour la publier : l'identifiant YouTube de la vidéo (la partie après `v=`) et sa
- * durée. Elle est servie par youtube-nocookie.com et ne se charge qu'au clic : compléter alors la
- * politique de confidentialité (`src/pages/confidentialite.astro`) et `VERSION_CONSENTEMENT`.
+ * durée. Elle est servie par youtube-nocookie.com et ne se charge qu'au clic, avec un avis sous
+ * l'affiche (`hero.videoAvis`) : compléter alors la politique de confidentialité
+ * (`src/pages/confidentialite.astro`, section « Cookies et stockage ») et `VERSION_CONSENTEMENT`.
  */
 export const VIDEO_PRESENTATION: { youtube: string; duree: string } = { youtube: '', duree: '' };
 
@@ -91,6 +92,7 @@ export interface Textes {
     videoTitre: string;
     videoTexte: string;
     videoLire: string;
+    videoAvis: string;
   };
   reperes: {
     libelle: string;
@@ -242,6 +244,7 @@ export const TEXTES: Textes = {
     videoTitre: 'Présentation de l’Académie',
     videoTexte: 'Le cursus, les enseignants, une séance en direct',
     videoLire: 'Lire la vidéo de présentation de l’Académie',
+    videoAvis: 'En lançant la vidéo, vous acceptez son chargement depuis YouTube (Google).',
   },
   reperes: {
     libelle: 'La rentrée en bref',
