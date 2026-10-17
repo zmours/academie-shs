@@ -199,15 +199,20 @@ export const COMPETENCES = {
 };
 
 /**
- * La rentrée, telle que l'association l'a fixée le 16/10/2026. Les jours et horaires des cours ne
- * sont pas encore arrêtés : ne pas les afficher, la page dit seulement « 3 h par semaine ».
+ * La rentrée, telle que l'association l'a fixée (16/10/2026, mise à jour le 17/10/2026). Pas de
+ * date précise : la page dit « début novembre ».
  */
 export const RENTREE = {
-  /** Premier jour des cours. */
-  debut: '2026-11-01',
-  heuresParSemaine: 3,
+  annee: 2026,
+  debut: 'début novembre',
+  /** Les soirs de cours, les mêmes pour tous. */
+  jours: ['lundi', 'mardi', 'mercredi'],
+  /** Chaque soir, deux séances d'une heure. */
+  seances: ['19 h – 20 h', '20 h – 21 h'],
+  /** 3 soirs × 2 séances d'une heure. */
+  heuresParSemaine: 6,
   /** Prix de la première année, en euros. */
-  prixPremiereAnnee: 400,
+  prixPremiereAnnee: 250,
 };
 
 /** Volume horaire total d'une année : la somme des heures de ses matières. */

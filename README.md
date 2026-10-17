@@ -35,7 +35,7 @@ avant l'envoi du formulaire.
 
 ## Changer la rentrée, le prix ou publier la vidéo
 
-- Date de rentrée, heures par semaine, prix : `RENTREE` dans `src/data/cours.ts`. Tous les textes
+- Rentrée, soirs et horaires des cours, heures par semaine, prix : `RENTREE` dans `src/data/cours.ts`. Tous les textes
   de la page (repères, carte du prix, questions, barre sur téléphone) en découlent. **L'image de
   partage les écrit en dur** : mettre `outils/og-image.html` d'accord, `npm run images`, puis
   changer le `v=` de l'image dans `src/layouts/Base.astro` (WhatsApp garde l'ancienne sinon).

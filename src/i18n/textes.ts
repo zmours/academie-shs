@@ -4,7 +4,7 @@
 // textes arabes et anglais de l'ancienne page sont gardés dans `textes-archive.ts`, pour rouvrir
 // ces langues plus tard.
 //
-// Les chiffres de la rentrée (date, heures, prix) ne sont jamais écrits en dur : ils viennent de
+// Les chiffres de la rentrée (début, soirs, horaires, heures, prix) ne sont jamais écrits en dur : ils viennent de
 // `RENTREE` et des heures de la première année, dans `src/data/cours.ts`.
 
 import { ANNEES, RENTREE, heuresAnnee, type Langue } from '../data/cours';
@@ -54,17 +54,21 @@ const SEMAINES = Math.round(HEURES / RENTREE.heuresParSemaine);
 const HEURES_MATIERE = PREMIERE.matieres[0]?.heures ?? 0;
 const NB_MATIERES = PREMIERE.matieres.length;
 const PRIX = `${RENTREE.prixPremiereAnnee} €`;
-const MOIS = ['janvier', 'février', 'mars', 'avril', 'mai', 'juin', 'juillet', 'août', 'septembre', 'octobre', 'novembre', 'décembre'];
+const SEANCE_HEURES = RENTREE.seances.map((x) => x.split(' – ')) as [string, string][];
+/** « 19 h – 21 h » : du début de la première séance à la fin de la dernière. */
+const HORAIRE = `${SEANCE_HEURES[0][0]} – ${SEANCE_HEURES[SEANCE_HEURES.length - 1][1]}`;
+const JOURS_SEMAINE = ['lundi', 'mardi', 'mercredi', 'jeudi', 'vendredi', 'samedi', 'dimanche'];
 
-/** « 1<sup>er</sup> novembre 2026 » (HTML), à partir de `RENTREE.debut`. */
-function dateHtml(iso: string, avecAnnee = true): string {
-  const [annee, mois, jour] = iso.split('-').map(Number);
-  const j = jour === 1 ? '1<sup>er</sup>' : String(jour);
-  return `${j} ${MOIS[mois - 1]}${avecAnnee ? ` ${annee}` : ''}`;
+/** « lundi, mardi et mercredi » */
+function enumerer(mots: readonly string[]): string {
+  return mots.length <= 1 ? (mots[0] ?? '') : `${mots.slice(0, -1).join(', ')} et ${mots[mots.length - 1]}`;
 }
-const DEBUT = dateHtml(RENTREE.debut);
-const DEBUT_COURT = dateHtml(RENTREE.debut, false);
-const DEBUT_TEXTE = DEBUT.replace(/<\/?sup>/g, '');
+const JOURS = enumerer(RENTREE.jours);
+const JOURS_ABREGES = RENTREE.jours.map((j) => `${j.slice(0, 3)}.`).join(', ');
+const majuscule = (t: string) => t.charAt(0).toUpperCase() + t.slice(1);
+/** « début novembre 2026 » */
+const DEBUT = `${RENTREE.debut} ${RENTREE.annee}`;
+const NB_SEANCES = RENTREE.seances.length === 2 ? 'deux' : String(RENTREE.seances.length);
 
 /** Les champs marqués « html » contiennent des exposants (<sup>) : ils sont écrits avec set:html. */
 export interface Textes {
@@ -101,8 +105,8 @@ export interface Textes {
     heuresTexte: string;
     prix: number;
     prixTexte: string;
-    direct: string;
-    directTexte: string;
+    jours: string;
+    horaire: string;
   };
   programme: {
     surtitre: string;
@@ -131,7 +135,13 @@ export interface Textes {
     /** html */
     titre: string;
     faits: { valeur: number; suffixe: string; texte: string }[];
-    note: string;
+    planning: {
+      titre: string;
+      /** Les sept jours, abrégés ; `actif` pour les soirs de cours. */
+      jours: { abrege: string; actif: boolean }[];
+      seances: string[];
+      texte: string;
+    };
     prixSurtitre: string;
     prix: number;
     prixUnite: string;
@@ -181,8 +191,6 @@ export interface Textes {
     paysOptions: Option[];
     niveau: string;
     niveauOptions: Option[];
-    creneaux: string;
-    creneauxOptions: Option[];
     origine: string;
     origineOptions: Option[];
     majeur: string;
@@ -210,7 +218,7 @@ export interface Textes {
 export const TEXTES: Textes = {
   meta: {
     titre: 'Académie SHS — Études islamiques et sociales, cursus en trois ans',
-    description: `Un cursus de trois ans en ligne et en direct, pour adultes : sciences islamiques classiques, sciences humaines et cadre institutionnel français. Rentrée le ${DEBUT_TEXTE}. Préinscription gratuite et sans engagement.`,
+    description: `Un cursus de trois ans en ligne et en direct, pour adultes : sciences islamiques classiques, sciences humaines et cadre institutionnel français. Rentrée ${DEBUT}, ${RENTREE.heuresParSemaine} h par semaine. Préinscription gratuite et sans engagement.`,
   },
   nav: {
     cursus: 'Le cursus',
@@ -223,7 +231,7 @@ export const TEXTES: Textes = {
   },
   provisoire: 'Photo provisoire',
   hero: {
-    pastille: `Rentrée le ${DEBUT} · préinscriptions ouvertes`,
+    pastille: `Rentrée ${DEBUT} · préinscriptions ouvertes`,
     titreDebut: 'Les sciences islamiques, ',
     titreAccent: 'étudiées avec\u00a0méthode',
     titreFin: '.',
@@ -241,16 +249,16 @@ export const TEXTES: Textes = {
   },
   reperes: {
     libelle: 'La rentrée en bref',
-    debut: DEBUT_COURT,
-    debutTexte: 'début des cours',
+    debut: majuscule(RENTREE.debut.replace(/^début /, '')),
+    debutTexte: `début des cours, ${RENTREE.annee}`,
     heuresParSemaine: RENTREE.heuresParSemaine,
     semaine: 'de cours par semaine',
     heures: HEURES,
     heuresTexte: 'en 1<sup>re</sup> année',
     prix: RENTREE.prixPremiereAnnee,
     prixTexte: 'l’année',
-    direct: 'En direct',
-    directTexte: 'et en rediffusion',
+    jours: `${RENTREE.jours.length} soirs`,
+    horaire: `${JOURS_ABREGES}, ${HORAIRE}`,
   },
   programme: {
     surtitre: 'Le cursus',
@@ -270,14 +278,14 @@ export const TEXTES: Textes = {
     ],
     parcours: 'Le parcours',
     etapesParcours: [
-      { titre: '1<sup>re</sup> année', texte: `${NB_MATIERES} matières · ${HEURES} h · rentrée ${RENTREE.debut.slice(0, 4)}` },
+      { titre: '1<sup>re</sup> année', texte: `${NB_MATIERES} matières · ${HEURES} h · rentrée ${RENTREE.annee}` },
       { titre: '2<sup>e</sup> année', texte: `${ANNEES[1]?.matieres.length ?? 0} matières` },
       { titre: '3<sup>e</sup> année', texte: `${ANNEES[2]?.matieres.length ?? 0} matières` },
       { titre: 'Mémoire', texte: '80 à 120 pages' },
     ],
     matieres: (n) => (n <= 1 ? `${n} matière` : `${n} matières`),
     horairesAVenir: 'horaires à venir',
-    rentree: `Rentrée le ${DEBUT}`,
+    rentree: `Rentrée ${DEBUT}`,
     chiffres: [
       { valeur: NB_MATIERES, suffixe: '', libelle: 'matières' },
       { valeur: HEURES, suffixe: ' h', libelle: 'de cours' },
@@ -291,14 +299,19 @@ export const TEXTES: Textes = {
     certificatDetail: 'à l’issue du cursus.',
   },
   rentree: {
-    surtitre: `Rentrée ${RENTREE.debut.slice(0, 4)}`,
-    titre: `Les cours commencent le ${DEBUT_COURT}.`,
+    surtitre: `Rentrée ${RENTREE.annee}`,
+    titre: `Les cours commencent ${RENTREE.debut}.`,
     faits: [
       { valeur: RENTREE.heuresParSemaine, suffixe: 'h', texte: 'de cours par semaine, en ligne et en direct' },
       { valeur: HEURES, suffixe: 'h', texte: `en première année, soit ${SEMAINES} semaines de cours` },
       { valeur: NB_MATIERES, suffixe: '', texte: `matières de ${HEURES_MATIERE} heures chacune` },
     ],
-    note: 'Les jours et horaires des cours seront communiqués aux préinscrits. Indiquez vos disponibilités dans le formulaire : elles nous aident à les fixer.',
+    planning: {
+      titre: 'Chaque semaine',
+      jours: JOURS_SEMAINE.map((j) => ({ abrege: majuscule(j.slice(0, 3)), actif: RENTREE.jours.includes(j) })),
+      seances: RENTREE.seances,
+      texte: `${majuscule(JOURS)} soir : ${NB_SEANCES} séances d’une heure, de ${HORAIRE.replace(' – ', ' à ')}.`,
+    },
     prixSurtitre: 'Première année',
     prix: RENTREE.prixPremiereAnnee,
     prixUnite: 'l’année',
@@ -365,8 +378,8 @@ export const TEXTES: Textes = {
   etapes: {
     liste: [
       { titre: 'Vous vous préinscrivez', texte: 'Deux minutes, gratuit et sans engagement.' },
-      { titre: 'L’Académie vous recontacte', texte: 'Avec les jours et horaires des cours, pour finaliser l’inscription.' },
-      { titre: 'Vous entrez en 1re année', texte: `Dès le ${DEBUT_TEXTE}, en ligne et en direct, en français.` },
+      { titre: 'L’Académie vous recontacte', texte: 'Pour finaliser votre inscription avant la rentrée.' },
+      { titre: 'Vous entrez en 1re année', texte: `${majuscule(DEBUT)}, le ${JOURS} soir, en ligne et en direct.` },
     ],
   },
   formulaire: {
@@ -400,12 +413,6 @@ export const TEXTES: Textes = {
       { valeur: 'avance', libelle: 'Avancé' },
       { valeur: 'ne-sait-pas', libelle: 'Je ne sais pas' },
     ],
-    creneaux: 'Vos disponibilités',
-    creneauxOptions: [
-      { valeur: 'soir-semaine', libelle: 'Soirs de semaine' },
-      { valeur: 'samedi', libelle: 'Samedi' },
-      { valeur: 'dimanche', libelle: 'Dimanche' },
-    ],
     origine: 'Comment avez-vous connu l’Académie ?',
     origineOptions: [
       { valeur: '', libelle: 'Choisir…' },
@@ -428,7 +435,7 @@ export const TEXTES: Textes = {
     erreurEnvoi:
       'L’envoi n’a pas abouti. Vérifiez les champs et réessayez, ou écrivez-nous à contact@academie-shs.fr.',
     merciTitre: 'Merci, c’est noté !',
-    merciTexte: `Votre préinscription est enregistrée. L’Académie vous recontacte avant le ${DEBUT_COURT} avec les jours et horaires des cours.`,
+    merciTexte: `Votre préinscription est enregistrée. L’Académie vous recontacte avant la rentrée, ${RENTREE.debut}.`,
   },
   faq: {
     surtitre: 'Questions',
@@ -441,7 +448,7 @@ export const TEXTES: Textes = {
       },
       {
         q: 'Quand commencent les cours ?',
-        r: `Le ${DEBUT_TEXTE}, à raison de ${RENTREE.heuresParSemaine} heures de cours par semaine. Les jours et horaires seront communiqués aux préinscrits.`,
+        r: `${majuscule(DEBUT)}. Les cours ont lieu le ${JOURS} soir, de ${HORAIRE.replace(' – ', ' à ')} : ${NB_SEANCES} séances d’une heure chaque soir, soit ${RENTREE.heuresParSemaine} heures par semaine.`,
       },
       {
         q: 'Combien d’heures de cours en première année ?',
@@ -449,7 +456,7 @@ export const TEXTES: Textes = {
       },
       {
         q: 'La préinscription m’engage-t-elle ?',
-        r: 'Non. Elle est gratuite et sans engagement : vos disponibilités nous aident à fixer les jours et horaires des cours.',
+        r: 'Non. Elle est gratuite et sans engagement : elle nous aide à préparer la rentrée.',
       },
       { q: 'Faut-il parler arabe ?', r: 'Non. Les cours sont donnés en français.' },
       {
@@ -460,8 +467,8 @@ export const TEXTES: Textes = {
     ],
   },
   barreMobile: {
-    titre: `Rentrée le ${DEBUT_COURT}`,
-    texte: `${PRIX} l’année · ${RENTREE.heuresParSemaine} h par semaine`,
+    titre: `Rentrée ${DEBUT}`,
+    texte: `${PRIX} l’année · ${JOURS_ABREGES} ${HORAIRE}`,
     cta: 'Se préinscrire',
   },
   pied: {

@@ -40,7 +40,7 @@ nom (majuscules, tirets bas) et le type.
 | `NIVEAU` | Texte | `debutant`, `intermediaire`, `avance`, `ne-sait-pas` |
 | `MODULES` | Texte | `cursus-eis` (cursus complet, depuis le 11/10/2026) ; les préinscriptions plus anciennes gardent leurs codes de cours : `fiqh, sira, khaldun` |
 | `LANGUE_COURS` | Texte | `fr`, `ar`, `en`, séparés par une virgule (plus rempli depuis le 11/10/2026 : cours en français seulement) |
-| `CRENEAUX` | Texte | `soir-semaine`, `samedi`, `dimanche` |
+| `CRENEAUX` | Texte | `soir-semaine`, `samedi`, `dimanche` — plus demandé depuis le 17/10/2026 (soirs fixés pour tous) : vide pour les nouvelles préinscriptions, conservé pour les anciennes |
 | `ORIGINE` | Texte | `whatsapp`, `instagram`, `facebook`, `bouche-a-oreille`, `mosquee-association`, `autre` |
 | `LANGUE_SITE` | Texte | langue de la page utilisée : `fr`, `ar`, `en` |
 | `DATE_PREINSCRIPTION` | Date | première préinscription, jamais écrasée |

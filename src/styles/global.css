@@ -1033,19 +1033,73 @@ html[dir='rtl'] .btn:hover svg {
   color: var(--sourdine);
   line-height: 1.45;
 }
-.note {
-  margin-top: 28px;
+.planning {
+  margin-top: 32px;
+  max-width: 600px;
+  padding: 24px;
+  border-radius: var(--rayon);
+  background: var(--papier);
+  border: 1px solid var(--ligne);
+  display: grid;
+  gap: 14px;
+}
+.planning__titre {
+  font-size: 13px;
+  font-weight: 600;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: var(--metal-fonce);
+}
+.semaine {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: grid;
+  grid-template-columns: repeat(7, minmax(0, 1fr));
+  gap: 6px;
+}
+.semaine li {
+  text-align: center;
+  font-size: 13px;
+  font-weight: 600;
+  padding: 10px 0;
+  border-radius: 8px;
+  background: var(--fond);
+  color: var(--sourdine);
+  transition: background-color 0.5s ease, color 0.5s ease, transform 0.5s var(--douce);
+}
+.semaine li.actif {
+  background: var(--profond);
+  color: var(--metal);
+}
+.semaine li.actif:nth-child(2) {
+  transition-delay: 0.15s;
+}
+.semaine li.actif:nth-child(3) {
+  transition-delay: 0.3s;
+}
+.anime [data-revele]:not(.vu) .semaine li.actif {
+  background: var(--fond);
+  color: var(--sourdine);
+  transform: scale(0.85);
+}
+.planning__seances {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+.planning__seances span {
+  padding: 6px 12px;
+  border-radius: 999px;
+  background: color-mix(in srgb, var(--metal) 16%, transparent);
+  color: var(--metal-fonce);
+  font-size: 15px;
+  font-weight: 600;
+  font-variant-numeric: tabular-nums;
+}
+.planning > p:last-child {
   font-size: 15px;
   color: var(--sourdine);
-  display: flex;
-  gap: 10px;
-  align-items: flex-start;
-  max-width: 36em;
-}
-.note svg {
-  flex: none;
-  margin-top: 2px;
-  color: var(--metal-fonce);
 }
 .prix {
   position: relative;

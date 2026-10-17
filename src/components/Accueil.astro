@@ -87,7 +87,7 @@ const suivantes = ANNEES.filter((a) => a !== premiere);
     <div class="repere"><b><span data-compte={r.heuresParSemaine}>{r.heuresParSemaine}</span> h</b><span>{r.semaine}</span></div>
     <div class="repere"><b><span data-compte={r.heures}>{r.heures}</span> h</b><span set:html={r.heuresTexte} /></div>
     <div class="repere"><b><span data-compte={r.prix}>{r.prix}</span> €</b><span>{r.prixTexte}</span></div>
-    <div class="repere"><b>{r.direct}</b><span>{r.directTexte}</span></div>
+    <div class="repere"><b>{r.jours}</b><span>{r.horaire}</span></div>
   </div>
 </section>
 
@@ -198,10 +198,16 @@ const suivantes = ANNEES.filter((a) => a !== premiere);
           ))
         }
       </dl>
-      <p class="note">
-        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3" y="4.5" width="18" height="16" rx="2"></rect><path d="M3 9.5h18M8 2.5v4M16 2.5v4"></path></svg>
-        <span>{t.rentree.note}</span>
-      </p>
+      <div class="planning">
+        <p class="planning__titre">{t.rentree.planning.titre}</p>
+        <ol class="semaine">
+          {t.rentree.planning.jours.map((j) => <li class={j.actif ? 'actif' : undefined}>{j.abrege}</li>)}
+        </ol>
+        <div class="planning__seances">
+          {t.rentree.planning.seances.map((x) => <span>{x}</span>)}
+        </div>
+        <p>{t.rentree.planning.texte}</p>
+      </div>
     </div>
     <div class="prix profond" data-revele>
       <span class="ar" aria-hidden="true">علم</span>
@@ -263,20 +269,6 @@ const suivantes = ANNEES.filter((a) => a !== premiere);
               </select>
             </label>
           </div>
-
-          <fieldset>
-            <legend>{f.creneaux}</legend>
-            <div class="puces">
-              {
-                f.creneauxOptions.map((o) => (
-                  <label class="puce">
-                    <input type="checkbox" name="creneaux" value={o.valeur} id={`creneau-${o.valeur}`} />
-                    {o.libelle}
-                  </label>
-                ))
-              }
-            </div>
-          </fieldset>
 
           <label class="champ">{f.origine}
             <select name="origine" id="origine">

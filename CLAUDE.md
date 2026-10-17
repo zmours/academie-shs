@@ -20,9 +20,11 @@ programme restent dans `src/data/cours.ts`. `/ar/` et `/en/` redirigent vers l'a
 - Jamais « diplôme », « licence », « master » ni « université » (Code de l'éducation,
   art. L731-14) : on écrit « certificat de l'Académie », « attestation de suivi ».
 - Ni date, ni tarif, ni nom d'enseignant tant que l'association ne les a pas fixés. Fixés le
-  16/10/2026 : rentrée le 1er novembre 2026, 3 h de cours par semaine, 400 € la première année,
-  six matières de 15 h (`RENTREE` et `heures` dans `src/data/cours.ts`). **Les jours et horaires
-  des cours ne sont pas validés : ne pas les afficher.**
+  16/10/2026 et mis à jour le 17/10/2026 : rentrée « début novembre » 2026 (**pas de date
+  précise**), lundi, mardi et mercredi soir, deux séances d'une heure (19 h – 20 h et
+  20 h – 21 h), soit 6 h par semaine, 250 € la première année, six matières de 15 h (`RENTREE` et
+  `heures` dans `src/data/cours.ts`). Les soirs étant les mêmes pour tous, le formulaire ne demande
+  plus de disponibilités (17/10/2026).
 - Le tableau horaire de l'association contient aussi le coût des enseignants (tarif horaire,
   coût net) : **donnée interne, jamais sur le site**.
 - Le programme (`src/data/cours.ts`) reprend **mot pour mot** `cursus.md`, le document de
